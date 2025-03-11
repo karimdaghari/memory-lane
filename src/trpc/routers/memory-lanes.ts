@@ -33,12 +33,12 @@ export const memoryLanesRouter = createTRPCRouter({
 			}
 		},
 	),
-	getBySlug: publicProcedure
+	get: publicProcedure
 		.input(z.string())
 		.query(async ({ ctx: { db, user }, input }) => {
 			try {
 				const data = await db.query.MemoryLanes.findFirst({
-					where: (f, op) => op.eq(f.slug, input),
+					where: (f, op) => op.or(op.eq(f.slug, input), op.eq(f.id, input)),
 				});
 
 				if (!data) {
@@ -48,10 +48,13 @@ export const memoryLanesRouter = createTRPCRouter({
 					});
 				}
 
-				let isOwner = false;
+				const isOwner = user?.id === data.userId;
 
-				if (user?.id === data.userId) {
-					isOwner = true;
+				if (data.visibility === "private" && !isOwner) {
+					throw new TRPCError({
+						code: "FORBIDDEN",
+						message: "You are not allowed to access this memory lane",
+					});
 				}
 
 				return {
