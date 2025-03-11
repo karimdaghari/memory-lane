@@ -1,24 +1,14 @@
 "use client";
 
 import { Typography } from "@/components/typography";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTRPC } from "@/trpc/client/react";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { Suspense } from "react";
 import { useEventsFilters } from "../filters";
 import { EventCard, EventCardLoading } from "./card-item";
 
 export function EventListing() {
-	return (
-		<div>
-			<Suspense fallback={<EventListingSkeleton />}>
-				<Loader />
-			</Suspense>
-		</div>
-	);
-}
-
-function Loader() {
 	const { id } = useParams<{ id: string }>();
 	const {
 		filters: { sort },
@@ -26,21 +16,32 @@ function Loader() {
 
 	const trpc = useTRPC();
 
-	const { data } = useSuspenseQuery(
+	const { data, isLoading, isError } = useQuery(
 		trpc.events.getAll.queryOptions({ laneId: id, sort }),
 	);
 
-	if (data.events.length === 0) {
+	if (isLoading) return <EventListingSkeleton />;
+
+	if (isError)
+		return (
+			<Alert>
+				<AlertTitle>Error loading events</AlertTitle>
+				<AlertDescription>
+					Please try again later or contact support if the problem persists.
+				</AlertDescription>
+			</Alert>
+		);
+
+	if (data?.events.length === 0)
 		return (
 			<Typography variant="muted" className="text-center">
 				You don't have any events yet. Create one to get started!
 			</Typography>
 		);
-	}
 
 	return (
 		<div className="space-y-4">
-			{data.events.map((event) => (
+			{data?.events.map((event) => (
 				<EventCard key={event.id} {...event} />
 			))}
 		</div>
