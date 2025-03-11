@@ -22,9 +22,7 @@ export function MemoryHeader(props: MemoryHeaderProps) {
 function Loader({ id }: MemoryHeaderProps) {
 	const trpc = useTRPC();
 
-	const { data } = useSuspenseQuery(
-		trpc.memoryLanes.getByIdOrSlug.queryOptions(id),
-	);
+	const { data } = useSuspenseQuery(trpc.memoryLanes.getById.queryOptions(id));
 
 	return <MemoryCardItem location="page" {...data} />;
 }

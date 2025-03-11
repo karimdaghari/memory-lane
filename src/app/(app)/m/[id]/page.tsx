@@ -1,6 +1,8 @@
 import { NewIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { HydrateClient } from "@/trpc/client/server";
+import { api } from "@/trpc/client/server";
+import { TRPCError } from "@trpc/server";
+import { notFound, redirect } from "next/navigation";
 import type { SearchParams } from "nuqs/server";
 import { EventCardEdit } from "./_components/event";
 import { EventListing } from "./_components/event/listing";
@@ -17,14 +19,25 @@ export default async function Page({ params, searchParams }: Props) {
 	const { id } = await params;
 	loadEventsFiltersParams(searchParams);
 
+	let isOwner = false;
+	try {
+		isOwner = await api.memoryLanes.checkHasAccess(id);
+	} catch (error) {
+		if (error instanceof TRPCError && error.code === "NOT_FOUND") {
+			notFound();
+		} else {
+			redirect("/");
+		}
+	}
+
 	return (
-		<HydrateClient>
-			<div className="space-y-4">
-				<MemoryHeader id={id} />
-				<div className="flex items-center lg:justify-between lg:flex-row flex-col gap-2 w-full">
-					<div className="w-full lg:w-auto">
-						<EventsFilters />
-					</div>
+		<div className="space-y-4">
+			<MemoryHeader id={id} />
+			<div className="flex items-center lg:justify-between lg:flex-row flex-col gap-2 w-full">
+				<div className="w-full lg:w-auto">
+					<EventsFilters />
+				</div>
+				{isOwner ? (
 					<div className="w-full lg:w-auto">
 						<EventCardEdit laneId={id}>
 							<Button className="w-full">
@@ -33,11 +46,11 @@ export default async function Page({ params, searchParams }: Props) {
 							</Button>
 						</EventCardEdit>
 					</div>
-				</div>
-				<div className="space-y-4 max-w-xl mx-auto">
-					<EventListing />
-				</div>
+				) : null}
 			</div>
-		</HydrateClient>
+			<div className="space-y-4 max-w-xl mx-auto">
+				<EventListing isOwner={isOwner} />
+			</div>
+		</div>
 	);
 }

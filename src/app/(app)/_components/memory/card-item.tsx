@@ -57,7 +57,7 @@ import { CopyButton } from "../copy-button";
 import { MemoryCardEdit } from "./card-edit";
 
 type Input =
-	| RouterOutputs["memoryLanes"]["getByIdOrSlug"]
+	| RouterOutputs["memoryLanes"]["getById"]
 	| RouterOutputs["memoryLanes"]["getAll"][number];
 
 type MemoryCardItemProps = Input & {
@@ -67,10 +67,17 @@ type MemoryCardItemProps = Input & {
 	 * @note This is used to determine the card's location and thus its design
 	 */
 	location?: "listing" | "page";
+	/**
+	 * Whether the current user is the owner of the memory lane
+	 * @default true
+	 * @note This is used to determine if the user can see the controls to edit the memory lane
+	 */
+	isOwner?: boolean;
 };
 
 export function MemoryCardItem({
 	location = "listing",
+	isOwner = true,
 	...props
 }: MemoryCardItemProps) {
 	const [openDelete, setOpenDelete] = useState(false);
@@ -123,7 +130,7 @@ export function MemoryCardItem({
 
 			{props.visibility === "public" && (
 				<MemoryCardShare
-					value={`/${props.slug}`}
+					value={`${window.origin}/m/${props.id}`}
 					open={openShare}
 					onOpenChange={setOpenShare}
 				/>
@@ -179,32 +186,34 @@ export function MemoryCardItem({
 				<Typography>{props.description}</Typography>
 			</CardContent>
 
-			<CardFooter
-				className={cn({
-					"flex justify-center gap-2": location === "page",
-				})}
-			>
-				{location === "page" ? (
-					actions
-						.filter((action) => !action.disabled)
-						.map((action) => (
-							<Button
-								key={action.label}
-								onClick={action.onClick}
-								variant={action.variant}
-								size="sm"
-								disabled={action.disabled}
-							>
-								{action.icon}
-								{action.label}
-							</Button>
-						))
-				) : (
-					<Link href={`/m/${props.id}`} className={buttonVariants()}>
-						View
-					</Link>
-				)}
-			</CardFooter>
+			{isOwner ? (
+				<CardFooter
+					className={cn({
+						"flex justify-center gap-2": location === "page",
+					})}
+				>
+					{location === "page" ? (
+						actions
+							.filter((action) => !action.disabled)
+							.map((action) => (
+								<Button
+									key={action.label}
+									onClick={action.onClick}
+									variant={action.variant}
+									size="sm"
+									disabled={action.disabled}
+								>
+									{action.icon}
+									{action.label}
+								</Button>
+							))
+					) : (
+						<Link href={`/m/${props.id}`} className={buttonVariants()}>
+							View
+						</Link>
+					)}
+				</CardFooter>
+			) : null}
 		</Card>
 	);
 }

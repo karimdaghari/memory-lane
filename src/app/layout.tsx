@@ -29,17 +29,17 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={geistSans.className} suppressHydrationWarning>
 			<body className="bg-accent text-foreground">
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<Toaster richColors position="top-right" closeButton />
-					<TRPCReactProvider>
+				<TRPCReactProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
 						<NuqsAdapter>{children}</NuqsAdapter>
-					</TRPCReactProvider>
-				</ThemeProvider>
+						<Toaster richColors position="top-right" closeButton />
+					</ThemeProvider>
+				</TRPCReactProvider>
 			</body>
 		</html>
 	);

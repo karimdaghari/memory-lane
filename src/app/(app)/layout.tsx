@@ -6,10 +6,10 @@ export default function AppLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="w-full rounded-lg bg-background h-full p-4">
-			<Navbar />
-			<main className="p-4 gap-4 flex flex-col lg:container mx-auto">
-				{children}
+		<div className="h-dvh p-6">
+			<main className="w-full rounded-lg bg-background h-full p-6 gap-4 flex flex-col">
+				<Navbar />
+				<div className="overflow-y-auto pr-3">{children}</div>
 			</main>
 		</div>
 	);

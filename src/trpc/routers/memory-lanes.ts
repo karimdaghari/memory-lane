@@ -33,12 +33,12 @@ export const memoryLanesRouter = createTRPCRouter({
 			}
 		},
 	),
-	getByIdOrSlug: publicProcedure
-		.input(z.string())
+	getById: publicProcedure
+		.input(z.string().uuid())
 		.query(async ({ ctx: { db, user }, input }) => {
 			try {
 				const data = await db.query.MemoryLanes.findFirst({
-					where: (f, op) => op.or(op.eq(f.slug, input), op.eq(f.id, input)),
+					where: (f, op) => op.eq(f.id, input),
 				});
 
 				if (!data) {
@@ -65,6 +65,31 @@ export const memoryLanesRouter = createTRPCRouter({
 					cause: err,
 				});
 			}
+		}),
+	checkHasAccess: publicProcedure
+		.input(z.string().uuid())
+		.query(async ({ ctx: { db, user }, input }) => {
+			const data = await db.query.MemoryLanes.findFirst({
+				where: (f, op) => op.eq(f.id, input),
+			});
+
+			if (!data) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: "Memory lane not found",
+				});
+			}
+
+			const isOwner = user?.id === data.userId;
+
+			if (data.visibility === "private" && !isOwner) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message: "You do not have access to this memory lane",
+				});
+			}
+
+			return isOwner;
 		}),
 	create: authProcedure
 		.input(MemoryLanesInsertSchema.omit({ id: true }))

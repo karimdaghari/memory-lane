@@ -67,7 +67,7 @@ export const eventsRouter = createTRPCRouter({
 	getAll: publicProcedure
 		.input(
 			z.object({
-				laneId: z.string(),
+				laneId: z.string().uuid(),
 				sort: z.enum(["asc", "desc"]).default("asc"),
 			}),
 		)

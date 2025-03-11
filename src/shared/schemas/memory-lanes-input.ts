@@ -7,7 +7,6 @@ export const MemoryLanesInsertSchema = createInsertSchema(MemoryLanes, {
 })
 	.omit({
 		userId: true,
-		slug: true,
 	})
 	.partial({
 		id: true,

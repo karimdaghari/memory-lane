@@ -8,7 +8,11 @@ import { useParams } from "next/navigation";
 import { useEventsFilters } from "../filters";
 import { EventCard, EventCardLoading } from "./card-item";
 
-export function EventListing() {
+interface EventListingProps {
+	isOwner: boolean;
+}
+
+export function EventListing({ isOwner }: EventListingProps) {
 	const { id } = useParams<{ id: string }>();
 	const {
 		filters: { sort },
@@ -35,7 +39,9 @@ export function EventListing() {
 	if (data?.events.length === 0)
 		return (
 			<Typography variant="muted" className="text-center">
-				You don't have any events yet. Create one to get started!
+				{isOwner
+					? "You don't have any events yet. Create one to get started!"
+					: "There are no events in this memory lane yet."}
 			</Typography>
 		);
 

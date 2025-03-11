@@ -11,6 +11,6 @@ export const Events = pgTable("events", {
 		.notNull(),
 	title: text().notNull(),
 	date: timestamp().notNull(),
+	image: text().notNull(),
 	description: text(),
-	image: text(),
 });
