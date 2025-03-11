@@ -23,7 +23,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client/react";
 import type { RouterOutputs } from "@/trpc/types";
 import { useMutation } from "@tanstack/react-query";
@@ -61,7 +60,7 @@ export function EventCard(props: EventCardProps) {
 	];
 
 	return (
-		<Card className={cn("rounded-lg")}>
+		<Card className="rounded-lg">
 			<EventCardDelete
 				title={props.title}
 				id={props.id}
@@ -70,14 +69,11 @@ export function EventCard(props: EventCardProps) {
 			/>
 			<EventCardEdit {...props} open={openEdit} onOpenChange={setOpenEdit} />
 			<CardHeader>
-				{props.image && (
-					<img
-						src={props.image}
-						height={500}
-						className="rounded-lg"
-						alt={props.title}
-					/>
-				)}
+				<img
+					src={props.image}
+					className="h-48 w-full object-cover"
+					alt={props.title}
+				/>
 			</CardHeader>
 
 			<CardContent>

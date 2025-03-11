@@ -167,6 +167,7 @@ export function Dropzone({
 							disabled={isUploading}
 							className="mt-2"
 							size="sm"
+							type="button"
 						>
 							<UploadIcon className="mr-2 h-4 w-4" />
 							{isUploading ? "Uploading..." : "Select Image"}
@@ -192,6 +193,7 @@ export function Dropzone({
 							onClick={removeImage}
 							disabled={isUploading || isDeleting}
 							className="absolute right-2 top-2 h-8 w-8 rounded-full bg-background shadow-sm"
+							type="button"
 						>
 							<XIcon className="h-4 w-4" />
 						</Button>
