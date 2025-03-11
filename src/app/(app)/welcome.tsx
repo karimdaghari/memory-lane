@@ -3,7 +3,7 @@ import { TextAnimate } from "@/components/magicui/text-animate";
 import { AnimatedBeamMultipleInput } from "@/components/multi-input-beam";
 import { Typography } from "@/components/typography";
 
-export function WelcomePublic() {
+export function Welcome() {
 	return (
 		<div className="flex flex-col gap-4 h-[80dvh] justify-center items-center">
 			<div className="space-y-2 text-center">

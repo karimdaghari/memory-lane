@@ -3,6 +3,7 @@ import { env } from "@/env/server";
 import { TRPCReactProvider } from "@/trpc/client/react";
 import { ThemeProvider } from "next-themes";
 import { Geist } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
 const defaultUrl = env.VERCEL_URL
@@ -27,15 +28,17 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" className={geistSans.className} suppressHydrationWarning>
-			<body className="bg-accent text-foreground">
+			<body className="bg-accent text-foreground p-6">
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"
 					enableSystem
 					disableTransitionOnChange
 				>
-					<Toaster richColors position="top-right" />
-					<TRPCReactProvider>{children}</TRPCReactProvider>
+					<Toaster richColors position="top-right" closeButton />
+					<TRPCReactProvider>
+						<NuqsAdapter>{children}</NuqsAdapter>
+					</TRPCReactProvider>
 				</ThemeProvider>
 			</body>
 		</html>

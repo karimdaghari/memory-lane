@@ -2,8 +2,9 @@ import {
 	LockKeyhole,
 	LockKeyholeOpen,
 	MoreVertical,
-	Plus,
 	Pencil,
+	Plus,
+	Share,
 	Trash,
 } from "lucide-react";
 
@@ -18,3 +19,5 @@ export const DeleteIcon = () => <Trash />;
 export const MoreVerticalIcon = () => <MoreVertical />;
 
 export const NewIcon = () => <Plus />;
+
+export const ShareIcon = () => <Share />;

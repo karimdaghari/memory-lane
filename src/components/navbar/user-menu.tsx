@@ -48,7 +48,7 @@ export function UserMenu() {
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<Button variant="ghost" size="icon" className="p-0 rounded-full">
-						<Avatar className="size-8">
+						<Avatar>
 							<AvatarImage src={user.avatar ?? undefined} />
 							<AvatarFallback className="text-xs">
 								{user.name?.slice(0, 2).toUpperCase()}

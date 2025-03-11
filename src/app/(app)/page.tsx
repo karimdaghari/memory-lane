@@ -1,6 +1,6 @@
 import { createClient } from "@/db/supabase/server";
 import { Home } from "./home";
-import { WelcomePublic } from "./welcome-public";
+import { Welcome } from "./welcome";
 
 export default async function AppPage() {
 	const supabase = await createClient();
@@ -9,7 +9,7 @@ export default async function AppPage() {
 		data: { user },
 	} = await supabase.auth.getUser();
 
-	if (!user) return <WelcomePublic />;
+	if (!user) return <Welcome />;
 
 	return <Home />;
 }

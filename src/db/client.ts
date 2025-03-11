@@ -15,3 +15,5 @@ if (!process.env.DATABASE_URL) {
 const client = postgres(process.env.DATABASE_URL as string, { prepare: false });
 
 export const db = drizzle({ client, schema, casing: "snake_case" });
+
+export type DB = typeof db;
