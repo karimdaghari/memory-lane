@@ -74,7 +74,7 @@ export function EventListing({ isOwner }: EventListingProps) {
 					{/* Events for this month */}
 					<div className="ml-12 space-y-4">
 						{group.events.map((event) => (
-							<EventCard key={event.id} {...event} isOwner={data.isOwner} />
+							<EventCard key={event.id} {...event} isOwner={isOwner} />
 						))}
 					</div>
 				</div>
