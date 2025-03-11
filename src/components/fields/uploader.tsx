@@ -9,6 +9,7 @@ interface UploaderFieldProps {
 	description?: string;
 	maxSize?: number;
 	className?: string;
+	value?: string | null;
 }
 
 export function UploaderField({
@@ -16,8 +17,10 @@ export function UploaderField({
 	description,
 	maxSize,
 	className,
+	value,
 }: UploaderFieldProps) {
 	const field = useFieldContext<string | null | undefined>();
+	const currentValue = value || field.state.value;
 
 	const errors = useStore(field.store, (state) =>
 		state.meta.errors.map(({ message }) => message),
@@ -30,6 +33,7 @@ export function UploaderField({
 				onImageChange={(url) => field.handleChange(url)}
 				maxSize={maxSize}
 				className={className}
+				initialValue={currentValue}
 			/>
 			{description && <Typography variant="muted">{description}</Typography>}
 			{errors && (

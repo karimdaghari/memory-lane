@@ -66,10 +66,17 @@ export function EventCardEdit({
 		validators: {
 			onSubmit: EventsInsertSchema,
 		},
-		onSubmit: async ({ value }) => {
+		onSubmit: async ({ value, formApi }) => {
 			if (value.id) {
 				return toast.promise(
-					updateMutation.mutateAsync({ id: value.id, ...value }),
+					updateMutation.mutateAsync(
+						{ id: value.id, ...value },
+						{
+							onSuccess: () => {
+								formApi.reset();
+							},
+						},
+					),
 					{
 						loading: "Updating event...",
 						success: "Event updated",
@@ -78,11 +85,18 @@ export function EventCardEdit({
 				);
 			}
 
-			return toast.promise(createMutation.mutateAsync(value), {
-				loading: "Creating event...",
-				success: "Event created",
-				error: "Failed to create event",
-			});
+			return toast.promise(
+				createMutation.mutateAsync(value, {
+					onSuccess: () => {
+						formApi.reset();
+					},
+				}),
+				{
+					loading: "Creating event...",
+					success: "Event created",
+					error: "Failed to create event",
+				},
+			);
 		},
 	});
 

@@ -74,13 +74,17 @@ export function MemoryCardEdit({
 		validators: {
 			onSubmit: MemoryLanesInsertSchema,
 		},
-		onSubmit: async ({ value }) => {
+		onSubmit: async ({ value, formApi }) => {
 			if (value.id) {
 				return toast.promise(
-					updateMutation.mutateAsync({
-						id: value.id,
-						...value,
-					}),
+					updateMutation.mutateAsync(
+						{ id: value.id, ...value },
+						{
+							onSuccess: () => {
+								formApi.reset();
+							},
+						},
+					),
 					{
 						loading: "Updating memory lane...",
 						success: "Memory lane updated",
@@ -89,11 +93,18 @@ export function MemoryCardEdit({
 				);
 			}
 
-			return toast.promise(createMutation.mutateAsync(value), {
-				loading: "Creating memory lane...",
-				success: "Memory lane created!",
-				error: "Failed to create memory lane",
-			});
+			return toast.promise(
+				createMutation.mutateAsync(value, {
+					onSuccess: () => {
+						formApi.reset();
+					},
+				}),
+				{
+					loading: "Creating memory lane...",
+					success: "Memory lane created!",
+					error: "Failed to create memory lane",
+				},
+			);
 		},
 	});
 

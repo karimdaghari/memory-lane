@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { useImageDelete } from "@/hooks/use-image-delete";
 import { useImageUpload } from "@/hooks/use-image-upload";
 import { cn } from "@/lib/utils";
 import { ImageIcon, UploadIcon, XIcon } from "lucide-react";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
 	type DropzoneOptions,
 	type FileRejection,
@@ -18,16 +19,34 @@ interface DropzoneProps {
 	onImageChange?: (uploadedUrl?: string | null) => void;
 	maxSize?: number; // in bytes
 	className?: string;
+	initialValue?: string | null;
 }
 
 export function Dropzone({
 	onImageChange,
 	maxSize = 5 * 1024 * 1024, // 5MB default
 	className = "",
+	initialValue,
 }: DropzoneProps) {
 	const [image, setImage] = useState<FileWithPreview | null>(null);
+	const [previewUrl, setPreviewUrl] = useState<string | null>(
+		initialValue || null,
+	);
 
 	const { mutate: uploadImage, isPending: isUploading } = useImageUpload();
+	const { mutate: deleteImage, isPending: isDeleting } = useImageDelete();
+
+	// Initialize with initialValue if provided
+	useEffect(() => {
+		if (initialValue && !image) {
+			setPreviewUrl(initialValue);
+		}
+	}, [initialValue, image]);
+
+	// Update previewUrl if initialValue changes
+	useEffect(() => {
+		setPreviewUrl(initialValue || null);
+	}, [initialValue]);
 
 	const onDrop = useCallback(
 		async (acceptedFiles: File[]) => {
@@ -42,6 +61,7 @@ export function Dropzone({
 				newImage.preview = URL.createObjectURL(newImage);
 
 				setImage(newImage);
+				setPreviewUrl(newImage.preview);
 
 				// Upload the image using the mutation
 				uploadImage(newImage, {
@@ -69,13 +89,31 @@ export function Dropzone({
 		if (image?.preview) {
 			URL.revokeObjectURL(image.preview);
 		}
-		setImage(null);
 
-		// Call external handler if provided
-		if (onImageChange) {
-			onImageChange(null);
+		// If we have an image URL, delete it from storage
+		if (initialValue) {
+			deleteImage(initialValue, {
+				onSuccess: () => {
+					setImage(null);
+					setPreviewUrl(null);
+
+					// Call external handler if provided
+					if (onImageChange) {
+						onImageChange(null);
+					}
+				},
+			});
+		} else {
+			// Just remove the preview if there's no URL to delete
+			setImage(null);
+			setPreviewUrl(null);
+
+			// Call external handler if provided
+			if (onImageChange) {
+				onImageChange(null);
+			}
 		}
-	}, [image, onImageChange]);
+	}, [image, onImageChange, deleteImage, initialValue]);
 
 	// Clean up object URLs when component unmounts
 	React.useEffect(() => {
@@ -103,7 +141,7 @@ export function Dropzone({
 
 	return (
 		<div className={cn("w-full max-w-md mx-auto", className)}>
-			{!image ? (
+			{!previewUrl ? (
 				<div
 					{...getRootProps()}
 					className={cn(
@@ -144,22 +182,22 @@ export function Dropzone({
 				<div className="space-y-4">
 					<div className="relative overflow-hidden rounded-md border bg-background">
 						<img
-							src={image.preview}
-							alt={image.name}
+							src={previewUrl}
+							alt={image?.name || "Uploaded image"}
 							className="mx-auto h-64 w-full object-contain"
 						/>
 						<Button
 							variant="outline"
 							size="icon"
 							onClick={removeImage}
-							disabled={isUploading}
+							disabled={isUploading || isDeleting}
 							className="absolute right-2 top-2 h-8 w-8 rounded-full bg-background shadow-sm"
 						>
 							<XIcon className="h-4 w-4" />
 						</Button>
 					</div>
 
-					{isUploading && (
+					{(isUploading || isDeleting) && (
 						<div className="w-full h-1 bg-muted relative overflow-hidden rounded-full">
 							<div
 								className="h-full bg-primary transition-all absolute left-0 top-0"
@@ -167,26 +205,6 @@ export function Dropzone({
 							/>
 						</div>
 					)}
-
-					<div className="flex items-center justify-between text-sm">
-						<div className="max-w-xs truncate">
-							<span className="font-medium">File:</span> {image.name}
-						</div>
-						<div className="text-muted-foreground">
-							{(image.size / 1024).toFixed(1)} KB
-						</div>
-					</div>
-
-					<Button
-						onClick={open}
-						variant="outline"
-						className="w-full"
-						disabled={isUploading}
-						size="sm"
-					>
-						<UploadIcon className="mr-2 h-4 w-4" />
-						{isUploading ? "Uploading..." : "Change Image"}
-					</Button>
 				</div>
 			)}
 		</div>
