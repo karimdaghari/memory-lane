@@ -1,5 +1,5 @@
 import { db } from "@/db/client";
-import { createClient } from "@/db/supabase/server";
+import { createClient } from "@/supabase/server";
 import { initTRPC } from "@trpc/server";
 import { experimental_nextAppDirCaller } from "@trpc/server/adapters/next-app-dir";
 import superjson from "superjson";

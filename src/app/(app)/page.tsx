@@ -1,4 +1,4 @@
-import { createClient } from "@/db/supabase/server";
+import { createClient } from "@/supabase/server";
 import { Home } from "./home";
 import { Welcome } from "./welcome";
 

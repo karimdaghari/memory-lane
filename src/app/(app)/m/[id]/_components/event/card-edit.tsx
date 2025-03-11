@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { useAppForm } from "@/hooks/forms";
 import { EventsInsertSchema } from "@/shared/schemas/events-input";
+import { useTRPC } from "@/trpc/client/react";
 import { useStore } from "@tanstack/react-form";
-
-interface Props extends EventsInsertSchema {
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+interface Props extends Partial<EventsInsertSchema> {
 	children?: React.ReactNode;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
@@ -25,12 +27,37 @@ export function EventCardEdit({
 	onOpenChange,
 	...input
 }: Props) {
+	const trpc = useTRPC();
+
+	const createMutation = useMutation(trpc.events.create.mutationOptions());
+
+	const updateMutation = useMutation(trpc.events.update.mutationOptions());
+
 	const form = useAppForm({
 		defaultValues: {
 			...input,
+			title: input.title ?? "Untitled",
 		} as EventsInsertSchema,
 		validators: {
 			onSubmit: EventsInsertSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (value.id) {
+				return toast.promise(
+					updateMutation.mutateAsync({ id: value.id, ...value }),
+					{
+						loading: "Updating event...",
+						success: "Event updated",
+						error: "Failed to update event",
+					},
+				);
+			}
+
+			return toast.promise(createMutation.mutateAsync(value), {
+				loading: "Creating event...",
+				success: "Event created",
+				error: "Failed to create event",
+			});
 		},
 	});
 
@@ -77,7 +104,7 @@ export function EventCardEdit({
 
 					<DialogFooter className="flex justify-end">
 						<form.SubmitButton form="event-card-form">
-							{input.id ? "Update" : "Create"}
+							{id ? "Update" : "Create"}
 						</form.SubmitButton>
 					</DialogFooter>
 				</DialogContent>

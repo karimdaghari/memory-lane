@@ -1,6 +1,6 @@
 import { createCallerFactory } from "../lib/init";
 import { createTRPCRouter } from "../lib/procedures";
-import { eventsRouter } from "./events";
+import { eventsRouter } from "./events/router";
 import { memoryLanesRouter } from "./memory-lanes";
 import { usersRouter } from "./users";
 

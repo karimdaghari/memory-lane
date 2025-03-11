@@ -9,7 +9,7 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from "../../lib/procedures";
-import { deleteEvent } from "./lib";
+import { deleteEvent } from "./delete-event";
 
 export const eventsRouter = createTRPCRouter({
 	/**

@@ -1,7 +1,19 @@
 "use client";
+
 import { DeleteIcon, EditIcon } from "@/components/icons";
 import { Typography } from "@/components/typography";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button, type ButtonProps } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -10,10 +22,13 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useTRPC } from "@/trpc/client/react";
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useState } from "react";
-import { EventCardDelete } from "./card-delete";
+import { toast } from "sonner";
 import { EventCardEdit } from "./card-edit";
 
 export function EventCard() {
@@ -91,5 +106,74 @@ export function EventCard() {
 				))}
 			</CardFooter>
 		</Card>
+	);
+}
+
+export function EventCardLoading() {
+	return (
+		<Card>
+			<CardHeader>
+				<Skeleton className="w-full aspect-[2/1] rounded-lg" />
+			</CardHeader>
+			<CardContent className="space-y-2">
+				<CardTitle>
+					<Skeleton className="h-6 w-3/4" />
+				</CardTitle>
+				<CardDescription>
+					<Skeleton className="h-4 w-1/3" />
+				</CardDescription>
+				<Skeleton className="h-20 w-full" />
+			</CardContent>
+		</Card>
+	);
+}
+
+interface EventCardDeleteProps {
+	title: string;
+	id: string;
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+}
+
+function EventCardDelete({
+	title,
+	open,
+	onOpenChange,
+	id,
+}: EventCardDeleteProps) {
+	const trpc = useTRPC();
+
+	const deleteMutation = useMutation(trpc.events.delete.mutationOptions());
+
+	const deleteEvent = async () => {
+		return toast.promise(deleteMutation.mutateAsync({ id }), {
+			loading: "Deleting event...",
+			success: "Event deleted",
+			error: "Failed to delete event",
+		});
+	};
+
+	return (
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle>You're about to delete {title}</AlertDialogTitle>
+					<AlertDialogDescription>
+						This action is irreversible. You will be deleting this event along
+						with the attached image.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+
+				<AlertDialogFooter>
+					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogAction
+						className={buttonVariants({ variant: "destructive" })}
+						onClick={deleteEvent}
+					>
+						Delete
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 }

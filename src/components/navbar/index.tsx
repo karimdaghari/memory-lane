@@ -1,5 +1,5 @@
 import { Logo } from "@/components/logo";
-import { createClient } from "@/db/supabase/server";
+import { createClient } from "@/supabase/server";
 import { ThemeSwitcher } from "../theme-switcher";
 import { SignInButton } from "./sign-in-button";
 import { SignUpButton } from "./sign-up-button";

@@ -1,7 +1,6 @@
 import type { DB } from "@/db/client";
 import { Events } from "@/db/schema";
-import { createClient } from "@/db/supabase/server";
-import { env } from "@/env/server";
+import { deleteImages } from "@/supabase/storage.server";
 import { TRPCError } from "@trpc/server";
 import { inArray } from "drizzle-orm";
 
@@ -35,12 +34,10 @@ export async function deleteEvent({
 		},
 	});
 
-	const imageUrls = events.map((event) => event.image as string);
-
-	const supabase = await createClient();
+	const images = events.map((event) => event.image as string);
 
 	await Promise.all([
 		db.delete(Events).where(inArray(Events.id, input)),
-		supabase.storage.from(env.SUPABASE_BUCKET_ID).remove(imageUrls),
+		deleteImages(images),
 	]);
 }

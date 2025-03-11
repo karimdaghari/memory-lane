@@ -1,5 +1,4 @@
 "use client";
-
 import {
 	Dialog,
 	DialogContent,
@@ -11,13 +10,18 @@ import {
 } from "@/components/ui/dialog";
 import { useAppForm } from "@/hooks/forms";
 import { MemoryLanesInsertSchema } from "@/shared/schemas/memory-lanes-input";
+import { useTRPC } from "@/trpc/client/react";
 import { useStore } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
 	getMemoryLaneVisibilityIcon,
 	getMemoryLaneVisibilityLabel,
 } from "./lib";
 
-interface Props extends MemoryLanesInsertSchema {
+export interface Props extends Partial<MemoryLanesInsertSchema> {
 	children?: React.ReactNode;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
@@ -25,18 +29,71 @@ interface Props extends MemoryLanesInsertSchema {
 
 export function MemoryCardEdit({
 	children,
-	open,
+	open = false,
 	onOpenChange,
 	...input
 }: Props) {
+	const trpc = useTRPC();
+
+	const router = useRouter();
+
+	const [_open, setOpen] = useState(open);
+
+	useEffect(() => {
+		setOpen(open);
+	}, [open]);
+
+	function handleOpenChange(open: boolean) {
+		setOpen(open);
+		onOpenChange?.(open);
+	}
+
+	const createMutation = useMutation(
+		trpc.memoryLanes.create.mutationOptions({
+			onSuccess: ({ id }) => {
+				handleOpenChange(false);
+				router.push(`/m/${id}`);
+			},
+		}),
+	);
+
+	const updateMutation = useMutation(
+		trpc.memoryLanes.update.mutationOptions({
+			onSuccess: () => {
+				handleOpenChange(false);
+			},
+		}),
+	);
+
 	const form = useAppForm({
 		defaultValues: {
 			...input,
-			title: input.title,
+			title: input.title ?? "Untitled",
 			visibility: input.visibility ?? "private",
 		} as MemoryLanesInsertSchema,
 		validators: {
 			onSubmit: MemoryLanesInsertSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (value.id) {
+				return toast.promise(
+					updateMutation.mutateAsync({
+						id: value.id,
+						...value,
+					}),
+					{
+						loading: "Updating memory lane...",
+						success: "Memory lane updated",
+						error: "Failed to update memory lane",
+					},
+				);
+			}
+
+			return toast.promise(createMutation.mutateAsync(value), {
+				loading: "Creating memory lane...",
+				success: "Memory lane created!",
+				error: "Failed to create memory lane",
+			});
 		},
 	});
 
@@ -45,7 +102,7 @@ export function MemoryCardEdit({
 
 	return (
 		<form.AppForm>
-			<Dialog open={open} onOpenChange={onOpenChange}>
+			<Dialog open={_open} onOpenChange={handleOpenChange}>
 				<DialogTrigger asChild>{children}</DialogTrigger>
 				<DialogContent>
 					<DialogHeader>

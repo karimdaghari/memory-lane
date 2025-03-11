@@ -8,7 +8,7 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from "../lib/procedures";
-import { deleteEvent } from "./events/lib";
+import { deleteEvent } from "./events/delete-event";
 
 export const memoryLanesRouter = createTRPCRouter({
 	getAll: authProcedure.query(
@@ -33,7 +33,7 @@ export const memoryLanesRouter = createTRPCRouter({
 			}
 		},
 	),
-	get: publicProcedure
+	getByIdOrSlug: publicProcedure
 		.input(z.string())
 		.query(async ({ ctx: { db, user }, input }) => {
 			try {
