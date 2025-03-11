@@ -1,0 +1,17 @@
+services:
+  memory_lane_db:
+    image: postgres:15.8
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: app
+    ports:
+      - 5432:5432
+    volumes:
+      - memory_lane_db:/var/lib/postgresql/data
+    networks:
+      - memory_lane-network
+volumes:
+  memory_lane_db:
+networks:
+  memory_lane-network:
