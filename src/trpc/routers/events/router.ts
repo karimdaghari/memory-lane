@@ -1,6 +1,5 @@
-import { Events, MemoryLanes } from "@/db/schema";
+import { Events } from "@/db/schema";
 import { EventsInsertSchema } from "@/shared/schemas/events-input";
-import { MemoryLanesInsertSchema } from "@/shared/schemas/memory-lanes-input";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -121,34 +120,24 @@ export const eventsRouter = createTRPCRouter({
 			}
 		}),
 	create: authProcedure
-		.input(MemoryLanesInsertSchema.omit({ id: true }))
-		.mutation(
-			async ({
-				ctx: {
-					db,
-					user: { id: userId },
-				},
-				input,
-			}) => {
-				try {
-					const [data] = await db
-						.insert(MemoryLanes)
-						.values({
-							...input,
-							userId,
-						})
-						.returning();
+		.input(
+			EventsInsertSchema.omit({ id: true }).required({
+				laneId: true,
+			}),
+		)
+		.mutation(async ({ ctx: { db }, input }) => {
+			try {
+				const [data] = await db.insert(Events).values(input).returning();
 
-					return data;
-				} catch (err) {
-					throw new TRPCError({
-						code: "INTERNAL_SERVER_ERROR",
-						message: "Failed to create memory lane",
-						cause: err,
-					});
-				}
-			},
-		),
+				return data;
+			} catch (err) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to create memory lane",
+					cause: err,
+				});
+			}
+		}),
 	update: authProcedure
 		.input(EventsInsertSchema.required({ id: true }))
 		.mutation(async ({ ctx: { db }, input: { id, ...input } }) => {

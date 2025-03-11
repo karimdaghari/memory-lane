@@ -1,7 +1,6 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useImageUpload } from "@/hooks/use-image-upload";
+import { cn } from "@/lib/utils";
 import { ImageIcon, UploadIcon, XIcon } from "lucide-react";
 import React, { useCallback, useState } from "react";
 import {
@@ -9,6 +8,7 @@ import {
 	type FileRejection,
 	useDropzone,
 } from "react-dropzone";
+import { toast } from "sonner";
 
 interface FileWithPreview extends File {
 	preview: string;
@@ -26,7 +26,6 @@ export function Dropzone({
 	className = "",
 }: DropzoneProps) {
 	const [image, setImage] = useState<FileWithPreview | null>(null);
-	const [error, setError] = useState<string | null>(null);
 
 	const { mutate: uploadImage, isPending: isUploading } = useImageUpload();
 
@@ -43,7 +42,6 @@ export function Dropzone({
 				newImage.preview = URL.createObjectURL(newImage);
 
 				setImage(newImage);
-				setError(null);
 
 				// Upload the image using the mutation
 				uploadImage(newImage, {
@@ -51,9 +49,6 @@ export function Dropzone({
 						if (onImageChange) {
 							onImageChange(uploadedUrl);
 						}
-					},
-					onError: () => {
-						setError("Failed to upload image. Please try again.");
 					},
 				});
 			}
@@ -65,7 +60,7 @@ export function Dropzone({
 		const rejectionReasons = rejectedFiles[0]?.errors
 			.map((error) => error.message)
 			.join(", ");
-		setError(
+		toast.error(
 			`Image rejected: ${rejectionReasons || "Please upload a JPG, PNG, GIF or WebP image under 5MB"}`,
 		);
 	}, []);
@@ -107,85 +102,93 @@ export function Dropzone({
 		useDropzone(dropzoneOptions);
 
 	return (
-		<div className={`w-full max-w-md mx-auto ${className}`}>
-			<Card>
-				<CardContent className="pt-6">
-					{!image ? (
-						<div
-							{...getRootProps()}
-							className={`border-2 border-dashed rounded-lg p-8 text-center ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"}`}
+		<div className={cn("w-full max-w-md mx-auto", className)}>
+			{!image ? (
+				<div
+					{...getRootProps()}
+					className={cn(
+						"relative flex flex-col items-center justify-center rounded-md border-2 border-dashed p-8 text-center transition-colors",
+						isDragActive
+							? "border-primary bg-primary/5 text-primary"
+							: "border-muted-foreground/25 hover:border-muted-foreground/50",
+					)}
+				>
+					<input {...getInputProps()} />
+					<ImageIcon className="h-12 w-12 text-muted-foreground" />
+
+					<div className="mt-4 space-y-2">
+						<h3 className="text-sm font-medium">
+							{isDragActive
+								? "Drop the image here ..."
+								: "Drag & drop an image here"}
+						</h3>
+						<p className="text-xs text-muted-foreground">or</p>
+						<Button
+							onClick={open}
+							variant="secondary"
+							disabled={isUploading}
+							className="mt-2"
+							size="sm"
 						>
-							<input {...getInputProps()} />
-							<ImageIcon className="w-12 h-12 mx-auto text-gray-400" />
+							<UploadIcon className="mr-2 h-4 w-4" />
+							{isUploading ? "Uploading..." : "Select Image"}
+						</Button>
+					</div>
 
-							<div className="mt-4">
-								<p className="text-sm text-gray-700">
-									{isDragActive
-										? "Drop the image here ..."
-										: "Drag & drop an image here, or"}
-								</p>
-								<Button
-									onClick={open}
-									variant="outline"
-									className="mt-2"
-									disabled={isUploading}
-								>
-									<UploadIcon className="w-4 h-4 mr-2" />
-									{isUploading ? "Uploading..." : "Select Image"}
-								</Button>
-							</div>
+					<p className="mt-4 text-xs text-muted-foreground">
+						Supports: JPG, PNG, GIF, WebP (Max:{" "}
+						{Math.round(maxSize / (1024 * 1024))}MB)
+					</p>
+				</div>
+			) : (
+				<div className="space-y-4">
+					<div className="relative overflow-hidden rounded-md border bg-background">
+						<img
+							src={image.preview}
+							alt={image.name}
+							className="mx-auto h-64 w-full object-contain"
+						/>
+						<Button
+							variant="outline"
+							size="icon"
+							onClick={removeImage}
+							disabled={isUploading}
+							className="absolute right-2 top-2 h-8 w-8 rounded-full bg-background shadow-sm"
+						>
+							<XIcon className="h-4 w-4" />
+						</Button>
+					</div>
 
-							<p className="mt-2 text-xs text-gray-500">
-								Supports: JPG, PNG, GIF, WebP (Max:{" "}
-								{Math.round(maxSize / (1024 * 1024))}MB)
-							</p>
-						</div>
-					) : (
-						<div className="space-y-4">
-							<div className="relative rounded-lg overflow-hidden border border-gray-200">
-								<img
-									src={image.preview}
-									alt={image.name}
-									className="w-full h-64 object-contain bg-gray-50"
-								/>
-								<Button
-									variant="ghost"
-									size="sm"
-									onClick={removeImage}
-									disabled={isUploading}
-									className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-sm"
-								>
-									<XIcon className="w-4 h-4 text-gray-700" />
-								</Button>
-							</div>
-							<div className="flex items-center justify-between">
-								<div className="text-sm truncate max-w-xs">
-									<span className="font-medium">Filename:</span> {image.name}
-								</div>
-								<div className="text-sm text-gray-500">
-									{(image.size / 1024).toFixed(1)} KB
-								</div>
-							</div>
-							<Button
-								onClick={open}
-								variant="outline"
-								className="w-full"
-								disabled={isUploading}
-							>
-								<UploadIcon className="w-4 h-4 mr-2" />
-								{isUploading ? "Uploading..." : "Change Image"}
-							</Button>
+					{isUploading && (
+						<div className="w-full h-1 bg-muted relative overflow-hidden rounded-full">
+							<div
+								className="h-full bg-primary transition-all absolute left-0 top-0"
+								style={{ width: "66%" }}
+							/>
 						</div>
 					)}
 
-					{error && (
-						<Alert variant="destructive" className="mt-4">
-							<AlertTitle>Error</AlertTitle>
-							<AlertDescription>{error}</AlertDescription>
-						</Alert>
-					)}
-				</CardContent>
-			</Card>
+					<div className="flex items-center justify-between text-sm">
+						<div className="max-w-xs truncate">
+							<span className="font-medium">File:</span> {image.name}
+						</div>
+						<div className="text-muted-foreground">
+							{(image.size / 1024).toFixed(1)} KB
+						</div>
+					</div>
+
+					<Button
+						onClick={open}
+						variant="outline"
+						className="w-full"
+						disabled={isUploading}
+						size="sm"
+					>
+						<UploadIcon className="mr-2 h-4 w-4" />
+						{isUploading ? "Uploading..." : "Change Image"}
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 }

@@ -14,6 +14,8 @@ import { EventsInsertSchema } from "@/shared/schemas/events-input";
 import { useTRPC } from "@/trpc/client/react";
 import { useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 interface Props extends Partial<EventsInsertSchema> {
 	children?: React.ReactNode;
@@ -23,15 +25,38 @@ interface Props extends Partial<EventsInsertSchema> {
 
 export function EventCardEdit({
 	children,
-	open,
+	open = false,
 	onOpenChange,
 	...input
 }: Props) {
 	const trpc = useTRPC();
 
-	const createMutation = useMutation(trpc.events.create.mutationOptions());
+	const [_open, setOpen] = useState(open);
 
-	const updateMutation = useMutation(trpc.events.update.mutationOptions());
+	useEffect(() => {
+		setOpen(open);
+	}, [open]);
+
+	function handleOpenChange(open: boolean) {
+		setOpen(open);
+		onOpenChange?.(open);
+	}
+
+	const createMutation = useMutation(
+		trpc.events.create.mutationOptions({
+			onSuccess: () => {
+				handleOpenChange(false);
+			},
+		}),
+	);
+
+	const updateMutation = useMutation(
+		trpc.events.update.mutationOptions({
+			onSuccess: () => {
+				handleOpenChange(false);
+			},
+		}),
+	);
 
 	const form = useAppForm({
 		defaultValues: {
@@ -66,7 +91,7 @@ export function EventCardEdit({
 
 	return (
 		<form.AppForm>
-			<Dialog open={open} onOpenChange={onOpenChange}>
+			<Dialog open={_open} onOpenChange={handleOpenChange}>
 				<DialogTrigger asChild>{children}</DialogTrigger>
 				<DialogContent>
 					<DialogHeader>
@@ -85,6 +110,14 @@ export function EventCardEdit({
 						}}
 						className="space-y-4"
 					>
+						<form.AppField
+							name="image"
+							children={(field) => <field.UploaderField label="Image" />}
+						/>
+						<form.AppField
+							name="date"
+							children={(field) => <field.DateField label="Date" />}
+						/>
 						<form.AppField
 							name="title"
 							children={(field) => (

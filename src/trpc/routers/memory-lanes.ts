@@ -50,13 +50,6 @@ export const memoryLanesRouter = createTRPCRouter({
 
 				const isOwner = user?.id === data.userId;
 
-				if (data.visibility === "private" && !isOwner) {
-					throw new TRPCError({
-						code: "FORBIDDEN",
-						message: "You are not allowed to access this memory lane",
-					});
-				}
-
 				return {
 					...data,
 					isOwner,
