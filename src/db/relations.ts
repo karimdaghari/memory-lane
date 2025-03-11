@@ -1,14 +1,14 @@
 import { relations } from "drizzle-orm";
-import { Chats } from "./models/chat";
-import { Messages } from "./models/messages";
+import { Events } from "./models/events";
+import { MemoryLanes } from "./models/memory-lanes";
 
-export const ChatsRelations = relations(Chats, ({ many }) => ({
-	messages: many(Messages),
+export const memoryLaneRelations = relations(MemoryLanes, ({ many }) => ({
+	events: many(Events),
 }));
 
-export const MessagesRelations = relations(Messages, ({ one }) => ({
-	chat: one(Chats, {
-		fields: [Messages.chatId],
-		references: [Chats.id],
+export const eventRelations = relations(Events, ({ one }) => ({
+	lane: one(MemoryLanes, {
+		fields: [Events.laneId],
+		references: [MemoryLanes.id],
 	}),
 }));

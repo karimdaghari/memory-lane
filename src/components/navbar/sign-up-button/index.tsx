@@ -46,13 +46,13 @@ export function SignUpButton() {
 	return (
 		<Dialog open={open} onOpenChange={handleOpenChange}>
 			<DialogTrigger asChild>
-				<Button size="sm">
+				<Button size="sm" className="hidden lg:inline-flex">
 					<UserIcon />
 					Sign up
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="max-w-md">
+			<DialogContent className="max-w-sm lg:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Sign up</DialogTitle>
 					<DialogDescription>

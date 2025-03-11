@@ -1,9 +1,9 @@
+import { MemoryCardEdit } from "@/app/(app)/_components/memory";
+import { NewIcon } from "@/components/icons";
 import { Logo } from "@/components/logo";
 import { createClient } from "@/db/supabase/server";
-import { Edit } from "lucide-react";
-import Link from "next/link";
 import { ThemeSwitcher } from "../theme-switcher";
-import { buttonVariants } from "../ui/button";
+import { Button } from "../ui/button";
 import { SidebarTrigger } from "../ui/sidebar";
 import {
 	Tooltip,
@@ -39,17 +39,12 @@ export async function Navbar() {
 
 						<TooltipProvider>
 							<Tooltip>
-								<TooltipTrigger>
-									<Link
-										href="/"
-										className={buttonVariants({
-											variant: "ghost",
-											size: "sm",
-											className: "rounded-full",
-										})}
-									>
-										<Edit />
-									</Link>
+								<TooltipTrigger asChild>
+									<MemoryCardEdit title="New Memory Lane">
+										<Button variant="ghost" size="sm">
+											<NewIcon />
+										</Button>
+									</MemoryCardEdit>
 								</TooltipTrigger>
 								<TooltipContent side="right">
 									Create a new memory lane
@@ -60,7 +55,7 @@ export async function Navbar() {
 				) : null}
 			</div>
 
-			<div className="flex items-center gap-2 pr-4">
+			<div className="flex items-center gap-2">
 				<ThemeSwitcher />
 				{user ? (
 					<UserMenu />

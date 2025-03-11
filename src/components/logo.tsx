@@ -1,4 +1,4 @@
-import { SwitchCameraIcon } from "lucide-react";
+import { CameraIcon } from "lucide-react";
 import Link from "next/link";
 import { Typography } from "./typography";
 import { buttonVariants } from "./ui/button";
@@ -9,15 +9,29 @@ import {
 	TooltipTrigger,
 } from "./ui/tooltip";
 
-export function Logo() {
+interface LogoProps {
+	display?: "compact" | "full";
+}
+
+function BaseLogo() {
+	return <CameraIcon className="size-6" />;
+}
+
+export function Logo({ display = "full" }: LogoProps) {
+	if (display === "compact") {
+		return <BaseLogo />;
+	}
+
 	return (
 		<div className="flex items-center gap-1">
 			<Link
 				href="/"
-				className="flex items-start gap-2 hover:bg-accent/50 transition-colors duration-300 ease-in-out px-2 py-1 rounded-lg"
+				className="flex items-center gap-2 hover:bg-accent/50 transition-colors duration-300 ease-in-out px-2 py-1 rounded-lg"
 			>
-				<SwitchCameraIcon className="size-6" />
-				<Typography variant="h4">Memory Lanes</Typography>
+				<BaseLogo />
+				<Typography variant="h4" className="hidden lg:inline">
+					Memory Lanes
+				</Typography>
 			</Link>
 
 			<TooltipProvider>

@@ -1,15 +1,15 @@
 import { useFieldContext } from "@/hooks/form-context";
 import { useStore } from "@tanstack/react-form";
 import { Typography } from "../typography";
-import { Input, type InputProps } from "../ui/input";
 import { Label } from "../ui/label";
+import { Tabs, type TabsProps } from "../ui/tabs";
 
-interface TextFieldProps extends InputProps {
+interface TabsFieldProps extends TabsProps {
 	label?: string;
 	description?: string;
 }
 
-export function TextField({ label, description, ...props }: TextFieldProps) {
+export function TabsField({ label, description, ...props }: TabsFieldProps) {
 	const field = useFieldContext<string | null | undefined>();
 
 	const errors = useStore(field.store, (state) =>
@@ -19,10 +19,10 @@ export function TextField({ label, description, ...props }: TextFieldProps) {
 	return (
 		<div className="space-y-2">
 			{label && <Label>{label}</Label>}
-			<Input
+			<Tabs
 				{...props}
 				value={field.state.value ?? undefined}
-				onChange={(e) => field.handleChange(e.target.value)}
+				onValueChange={(value) => field.handleChange(value)}
 			/>
 			{description && <Typography variant="muted">{description}</Typography>}
 			{errors && (

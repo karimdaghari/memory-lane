@@ -1,15 +1,20 @@
 import { useFieldContext } from "@/hooks/form-context";
 import { useStore } from "@tanstack/react-form";
 import { Typography } from "../typography";
-import { Input, type InputProps } from "../ui/input";
 import { Label } from "../ui/label";
+import type { TextareaProps } from "../ui/textarea";
+import { Textarea } from "../ui/textarea";
 
-interface TextFieldProps extends InputProps {
+interface TextareaFieldProps extends TextareaProps {
 	label?: string;
 	description?: string;
 }
 
-export function TextField({ label, description, ...props }: TextFieldProps) {
+export function TextareaField({
+	label,
+	description,
+	...props
+}: TextareaFieldProps) {
 	const field = useFieldContext<string | null | undefined>();
 
 	const errors = useStore(field.store, (state) =>
@@ -19,7 +24,7 @@ export function TextField({ label, description, ...props }: TextFieldProps) {
 	return (
 		<div className="space-y-2">
 			{label && <Label>{label}</Label>}
-			<Input
+			<Textarea
 				{...props}
 				value={field.state.value ?? undefined}
 				onChange={(e) => field.handleChange(e.target.value)}

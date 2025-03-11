@@ -13,7 +13,9 @@ export default function AppLayout({
 			<SidebarInset className="rounded-lg m-4">
 				<div className="w-full rounded-full bg-background p-6">
 					<Navbar />
-					<main className="p-4 gap-4 flex flex-col h-[80dvh]">{children}</main>
+					<main className="p-4 gap-4 flex flex-col lg:container mx-auto">
+						{children}
+					</main>
 				</div>
 			</SidebarInset>
 		</SidebarProvider>
