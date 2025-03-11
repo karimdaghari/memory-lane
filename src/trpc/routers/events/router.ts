@@ -81,48 +81,36 @@ export const eventsRouter = createTRPCRouter({
 				});
 
 				// Group events by month/year
-				const groupedEvents = events.reduce(
+				const groupedEventsMap = events.reduce(
 					(acc, event) => {
 						const date = event.date;
-						const monthYear = date.toLocaleString("default", {
-							month: "long",
-							year: "numeric",
-						});
+						// Create a new Date object set to the first of the month
+						const monthDate = new Date(date.getFullYear(), date.getMonth(), 1);
+						const key = monthDate.toISOString();
 
-						if (!acc[monthYear]) {
-							acc[monthYear] = [];
+						if (!acc[key]) {
+							acc[key] = {
+								date: monthDate,
+								events: [],
+							};
 						}
 
-						acc[monthYear].push(event);
+						acc[key].events.push(event);
 						return acc;
 					},
-					{} as Record<string, typeof events>,
+					{} as Record<string, { date: Date; events: typeof events }>,
 				);
 
-				// Sort the month/year keys based on the first event's date in each group
-				const sortedKeys = Object.keys(groupedEvents).sort((a, b) => {
-					const dateA = groupedEvents[a].at(0)?.date.getTime();
-					const dateB = groupedEvents[b].at(0)?.date.getTime();
-
-					if (!dateA || !dateB) {
-						return 0;
-					}
-
-					return sort === "desc" ? dateB - dateA : dateA - dateB;
+				// Convert to array and sort
+				const groupedEvents = Object.values(groupedEventsMap).sort((a, b) => {
+					return sort === "desc"
+						? b.date.getTime() - a.date.getTime()
+						: a.date.getTime() - b.date.getTime();
 				});
-
-				// Create a new object with sorted groups
-				const sortedGroupedEvents = sortedKeys.reduce(
-					(acc, key) => {
-						acc[key] = groupedEvents[key];
-						return acc;
-					},
-					{} as Record<string, typeof events>,
-				);
 
 				return {
 					events,
-					groupedEvents: sortedGroupedEvents,
+					groupedEvents,
 				};
 			} catch (err) {
 				throw new TRPCError({

@@ -5,8 +5,8 @@ type Sort = RouterInputs["events"]["getAll"]["sort"];
 
 export const SortOptions = ["asc", "desc"] as const satisfies Sort[];
 
-export const sortingSearchParams = {
+export const eventsFiltersParams = {
 	sort: parseAsStringLiteral(SortOptions).withDefault("desc"),
 };
 
-export const loadSortingSearchParams = createLoader(sortingSearchParams);
+export const loadEventsFiltersParams = createLoader(eventsFiltersParams);

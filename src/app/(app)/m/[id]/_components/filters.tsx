@@ -8,10 +8,16 @@ import {
 } from "@/components/ui/select";
 import { SortAscIcon, SortDescIcon } from "lucide-react";
 import { useQueryStates } from "nuqs";
-import { SortOptions, sortingSearchParams } from "../search-params";
+import { SortOptions, eventsFiltersParams } from "../search-params";
 
-export function SelectSorting() {
-	const [{ sort }, setSort] = useQueryStates(sortingSearchParams);
+export const useEventsFilters = () => {
+	const [filters, setFilters] = useQueryStates(eventsFiltersParams);
+
+	return { filters, setFilters };
+};
+
+export function EventsFilters() {
+	const { filters, setFilters } = useEventsFilters();
 
 	const options = SortOptions.map((value) => ({
 		icon: value === "desc" ? SortDescIcon : SortAscIcon,
@@ -21,8 +27,10 @@ export function SelectSorting() {
 
 	return (
 		<Select
-			value={sort}
-			onValueChange={(value) => setSort({ sort: value as typeof sort })}
+			value={filters.sort}
+			onValueChange={(value) =>
+				setFilters({ sort: value as typeof filters.sort })
+			}
 		>
 			<SelectTrigger className="w-full">
 				<SelectValue />

@@ -25,13 +25,18 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client/react";
+import type { RouterOutputs } from "@/trpc/types";
 import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import { EventCardEdit } from "./card-edit";
 
-export function EventCard() {
+type Input = RouterOutputs["events"]["getAll"]["events"][number];
+
+interface EventCardProps extends Input {}
+
+export function EventCard(props: EventCardProps) {
 	const [openDelete, setOpenDelete] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
 
@@ -58,38 +63,30 @@ export function EventCard() {
 	return (
 		<Card className={cn("rounded-lg")}>
 			<EventCardDelete
-				title="Untitled"
-				id="1"
+				title={props.title}
+				id={props.id}
 				open={openDelete}
 				onOpenChange={setOpenDelete}
 			/>
-			<EventCardEdit
-				title="Untitled"
-				date={new Date()}
-				laneId="1"
-				id="1"
-				open={openEdit}
-				onOpenChange={setOpenEdit}
-			/>
+			<EventCardEdit {...props} open={openEdit} onOpenChange={setOpenEdit} />
 			<CardHeader>
-				<img
-					src="https://images.unsplash.com/photo-1736606355698-5efdb410fe93?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-					alt="placeholder"
-					height={500}
-					className="rounded-lg"
-				/>
+				{props.image && (
+					<img
+						src={props.image}
+						height={500}
+						className="rounded-lg"
+						alt={props.title}
+					/>
+				)}
 			</CardHeader>
 
 			<CardContent>
-				<CardTitle className="truncate">Untitled</CardTitle>
-				<CardDescription>{format(new Date(), "MMM d, yyyy")}</CardDescription>
+				<CardTitle className="truncate">{props.title}</CardTitle>
+				<CardDescription>
+					{format(new Date(props.date), "MMM d, yyyy")}
+				</CardDescription>
 
-				<Typography>
-					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Doloribus,
-					cumque facere officia, minima similique, neque eius sequi ipsum
-					corporis odio consequuntur deserunt? Itaque corporis officiis
-					blanditiis deserunt, nemo adipisci debitis.
-				</Typography>
+				<Typography>{props.description}</Typography>
 			</CardContent>
 
 			<CardFooter className="flex-row gap-2">

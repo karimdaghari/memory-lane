@@ -2,10 +2,11 @@ import { NewIcon } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { HydrateClient } from "@/trpc/client/server";
 import type { SearchParams } from "nuqs/server";
-import { EventCard, EventCardEdit } from "./_components/event";
+import { EventCardEdit } from "./_components/event";
+import { EventListing } from "./_components/event/listing";
+import { EventsFilters } from "./_components/filters";
 import { MemoryHeader } from "./_components/header";
-import { SelectSorting } from "./_components/select-sorting";
-import { loadSortingSearchParams } from "./search-params";
+import { loadEventsFiltersParams } from "./search-params";
 
 interface Props {
 	params: Promise<{ id: string }>;
@@ -14,7 +15,7 @@ interface Props {
 
 export default async function Page({ params, searchParams }: Props) {
 	const { id } = await params;
-	loadSortingSearchParams(searchParams);
+	loadEventsFiltersParams(searchParams);
 
 	return (
 		<HydrateClient>
@@ -22,7 +23,7 @@ export default async function Page({ params, searchParams }: Props) {
 				<MemoryHeader id={id} />
 				<div className="flex items-center lg:justify-between lg:flex-row flex-col gap-2 w-full">
 					<div className="w-full lg:w-auto">
-						<SelectSorting />
+						<EventsFilters />
 					</div>
 					<div className="w-full lg:w-auto">
 						<EventCardEdit laneId={id}>
@@ -34,7 +35,7 @@ export default async function Page({ params, searchParams }: Props) {
 					</div>
 				</div>
 				<div className="space-y-4 max-w-xl mx-auto">
-					<EventCard />
+					<EventListing />
 				</div>
 			</div>
 		</HydrateClient>
