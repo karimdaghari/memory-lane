@@ -1,8 +1,10 @@
 "use client";
+import { DateField } from "@/components/fields/date";
 import { SubmitButton } from "@/components/fields/submit-button";
 import { TabsField } from "@/components/fields/tabs";
 import { TextField } from "@/components/fields/text";
 import { TextareaField } from "@/components/fields/textarea";
+import { UploaderField } from "@/components/fields/uploader";
 import { createFormHook } from "@tanstack/react-form";
 import { fieldContext, formContext } from "./form-context";
 
@@ -13,6 +15,8 @@ export const { useAppForm, withForm } = createFormHook({
 		TextField,
 		TextareaField,
 		TabsField,
+		DateField,
+		UploaderField,
 	},
 	formComponents: {
 		SubmitButton,
