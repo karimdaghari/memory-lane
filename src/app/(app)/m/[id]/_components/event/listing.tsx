@@ -4,6 +4,7 @@ import { Typography } from "@/components/typography";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTRPC } from "@/trpc/client/react";
 import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { useParams } from "next/navigation";
 import { useEventsFilters } from "../filters";
 import { EventCard, EventCardLoading } from "./card-item";
@@ -36,7 +37,7 @@ export function EventListing({ isOwner }: EventListingProps) {
 			</Alert>
 		);
 
-	if (data?.events.length === 0)
+	if (!data?.groupedEvents.length)
 		return (
 			<Typography variant="muted" className="text-center">
 				{isOwner
@@ -46,9 +47,37 @@ export function EventListing({ isOwner }: EventListingProps) {
 		);
 
 	return (
-		<div className="space-y-4">
-			{data?.events.map((event) => (
-				<EventCard key={event.id} {...event} />
+		<div className="space-y-8">
+			{data.groupedEvents.map((group, index) => (
+				<div key={group.date.toISOString()} className="relative">
+					{/* Timeline with connector line */}
+					<div
+						className="absolute left-4 top-8 bottom-0 w-0.5 bg-muted-foreground/30"
+						style={{
+							display:
+								index === data.groupedEvents.length - 1 ? "none" : "block",
+						}}
+					/>
+
+					{/* Month/Year Header */}
+					<div className="flex items-center mb-4">
+						<div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
+							<span className="text-xs font-semibold">
+								{format(group.date, "MMM")}
+							</span>
+						</div>
+						<Typography variant="h3" className="ml-4 font-semibold">
+							{format(group.date, "MMMM yyyy")}
+						</Typography>
+					</div>
+
+					{/* Events for this month */}
+					<div className="ml-12 space-y-4">
+						{group.events.map((event) => (
+							<EventCard key={event.id} {...event} isOwner={data.isOwner} />
+						))}
+					</div>
+				</div>
 			))}
 		</div>
 	);
@@ -56,10 +85,30 @@ export function EventListing({ isOwner }: EventListingProps) {
 
 function EventListingSkeleton() {
 	return (
-		<div className="space-y-4">
-			{Array.from({ length: 4 }).map((_, index) => (
+		<div className="space-y-8">
+			{Array.from({ length: 2 }).map((_, groupIndex) => (
 				// biome-ignore lint/suspicious/noArrayIndexKey: this is fine
-				<EventCardLoading key={index} />
+				<div key={groupIndex} className="relative">
+					{/* Timeline with connector line */}
+					<div
+						className="absolute left-4 top-8 bottom-0 w-0.5 bg-muted-foreground/30"
+						style={{ display: groupIndex === 1 ? "none" : "block" }}
+					/>
+
+					{/* Month/Year Header - Skeleton */}
+					<div className="flex items-center mb-4">
+						<div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted animate-pulse" />
+						<div className="ml-4 h-7 w-40 bg-muted rounded animate-pulse" />
+					</div>
+
+					{/* Events for this month - Skeleton */}
+					<div className="ml-12 space-y-4">
+						{Array.from({ length: 2 }).map((_, index) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: this is fine
+							<EventCardLoading key={index} />
+						))}
+					</div>
+				</div>
 			))}
 		</div>
 	);

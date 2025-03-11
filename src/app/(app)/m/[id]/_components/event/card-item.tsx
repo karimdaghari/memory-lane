@@ -33,9 +33,11 @@ import { EventCardEdit } from "./card-edit";
 
 type Input = RouterOutputs["events"]["getAll"]["events"][number];
 
-interface EventCardProps extends Input {}
+interface EventCardProps extends Input {
+	isOwner: boolean;
+}
 
-export function EventCard(props: EventCardProps) {
+export function EventCard({ isOwner, ...props }: EventCardProps) {
 	const [openDelete, setOpenDelete] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
 
@@ -85,19 +87,21 @@ export function EventCard(props: EventCardProps) {
 				<Typography>{props.description}</Typography>
 			</CardContent>
 
-			<CardFooter className="flex-row gap-2">
-				{actions.map((action) => (
-					<Button
-						key={action.label}
-						onClick={action.onClick}
-						variant={action.variant}
-						size="sm"
-					>
-						{action.icon}
-						{action.label}
-					</Button>
-				))}
-			</CardFooter>
+			{isOwner && (
+				<CardFooter className="flex-row gap-2">
+					{actions.map((action) => (
+						<Button
+							key={action.label}
+							onClick={action.onClick}
+							variant={action.variant}
+							size="sm"
+						>
+							{action.icon}
+							{action.label}
+						</Button>
+					))}
+				</CardFooter>
+			)}
 		</Card>
 	);
 }

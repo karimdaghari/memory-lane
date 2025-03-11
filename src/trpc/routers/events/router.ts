@@ -71,8 +71,24 @@ export const eventsRouter = createTRPCRouter({
 				sort: z.enum(["asc", "desc"]).default("asc"),
 			}),
 		)
-		.query(async ({ ctx: { db }, input: { laneId, sort } }) => {
+		.query(async ({ ctx: { db, user }, input: { laneId, sort } }) => {
 			try {
+				const memoryLane = await db.query.MemoryLanes.findFirst({
+					where: (f, op) => op.eq(f.id, laneId),
+					columns: {
+						userId: true,
+					},
+				});
+
+				if (!memoryLane) {
+					throw new TRPCError({
+						code: "NOT_FOUND",
+						message: "Memory lane not found",
+					});
+				}
+
+				const isOwner = memoryLane.userId === user?.id;
+
 				const events = await db.query.Events.findMany({
 					where: (f, op) => op.eq(f.laneId, laneId),
 					orderBy: (f, op) =>
@@ -110,6 +126,7 @@ export const eventsRouter = createTRPCRouter({
 				return {
 					events,
 					groupedEvents,
+					isOwner,
 				};
 			} catch (err) {
 				throw new TRPCError({
