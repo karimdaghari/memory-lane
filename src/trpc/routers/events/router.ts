@@ -1,5 +1,5 @@
-import { Events } from "@/db/schema";
-import { EventsInsertSchema } from "@/shared/schemas/events-input";
+import { Events, EventsSelectSchema } from "@/db/schema";
+import { EventsInsertSchema } from "@/shared/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -71,6 +71,17 @@ export const eventsRouter = createTRPCRouter({
 				sort: z.enum(["asc", "desc"]).default("asc"),
 			}),
 		)
+		.output(
+			z.object({
+				events: EventsSelectSchema.array(),
+				groupedEvents: z.array(
+					z.object({
+						date: z.date(),
+						events: EventsSelectSchema.array(),
+					}),
+				),
+			}),
+		)
 		.query(async ({ ctx: { db }, input: { laneId, sort } }) => {
 			try {
 				const memoryLane = await db.query.MemoryLanes.findFirst({
@@ -136,6 +147,7 @@ export const eventsRouter = createTRPCRouter({
 				laneId: true,
 			}),
 		)
+		.output(EventsSelectSchema)
 		.mutation(async ({ ctx: { db }, input }) => {
 			try {
 				const [data] = await db.insert(Events).values(input).returning();
@@ -151,6 +163,7 @@ export const eventsRouter = createTRPCRouter({
 		}),
 	update: authProcedure
 		.input(EventsInsertSchema.required({ id: true }))
+		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx: { db }, input: { id, ...input } }) => {
 			try {
 				await db.update(Events).set(input).where(eq(Events.id, id));
@@ -168,6 +181,7 @@ export const eventsRouter = createTRPCRouter({
 		}),
 	delete: authProcedure
 		.input(z.object({ id: z.string().uuid() }))
+		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx: { db }, input: { id } }) => {
 			try {
 				await deleteEvent({ db, input: { id } });

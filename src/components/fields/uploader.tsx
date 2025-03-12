@@ -3,6 +3,7 @@ import { useStore } from "@tanstack/react-form";
 import { Dropzone } from "../dropzone";
 import { Typography } from "../typography";
 import { Label } from "../ui/label";
+import { FormMessage } from "./form-message";
 
 interface UploaderFieldProps {
 	label?: string;
@@ -20,11 +21,7 @@ export function UploaderField({
 	value,
 }: UploaderFieldProps) {
 	const field = useFieldContext<string | null | undefined>();
-	const currentValue = value || field.state.value;
-
-	const errors = useStore(field.store, (state) =>
-		state.meta.errors.map(({ message }) => message),
-	);
+	const currentValue = useStore(field.store, (state) => state.value || value);
 
 	return (
 		<div className="space-y-2">
@@ -36,11 +33,7 @@ export function UploaderField({
 				initialValue={currentValue}
 			/>
 			{description && <Typography variant="muted">{description}</Typography>}
-			{errors && (
-				<Typography variant="small" className="text-destructive">
-					{errors.join(", ")}
-				</Typography>
-			)}
+			<FormMessage />
 		</div>
 	);
 }

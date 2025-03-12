@@ -2,7 +2,7 @@ import { MemoryCardEdit } from "@/app/(app)/_components/memory";
 import { NewIcon } from "@/components/icons";
 import { Typography } from "@/components/typography";
 import { Button } from "@/components/ui/button";
-import { MemoryLanesListing } from "./_components/memory/listing";
+import { MemoryLanesListing } from "./memory/listing";
 
 export function Home() {
 	return (

@@ -1,8 +1,8 @@
 import { useFieldContext } from "@/hooks/form-context";
-import { useStore } from "@tanstack/react-form";
 import { Typography } from "../typography";
 import { Label } from "../ui/label";
 import { Tabs, type TabsProps } from "../ui/tabs";
+import { FormMessage } from "./form-message";
 
 interface TabsFieldProps extends TabsProps {
 	label?: string;
@@ -11,10 +11,6 @@ interface TabsFieldProps extends TabsProps {
 
 export function TabsField({ label, description, ...props }: TabsFieldProps) {
 	const field = useFieldContext<string | null | undefined>();
-
-	const errors = useStore(field.store, (state) =>
-		state.meta.errors.map(({ message }) => message),
-	);
 
 	return (
 		<div className="space-y-2">
@@ -25,11 +21,7 @@ export function TabsField({ label, description, ...props }: TabsFieldProps) {
 				onValueChange={(value) => field.handleChange(value)}
 			/>
 			{description && <Typography variant="muted">{description}</Typography>}
-			{errors && (
-				<Typography variant="small" className="text-destructive">
-					{errors.join(", ")}
-				</Typography>
-			)}
+			<FormMessage />
 		</div>
 	);
 }

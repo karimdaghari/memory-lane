@@ -5,6 +5,7 @@ import { useStore } from "@tanstack/react-form";
 import { DatePicker, type DateValue, Group } from "react-aria-components";
 import { Typography } from "../typography";
 import { Label } from "../ui/label";
+import { FormMessage } from "./form-message";
 
 interface DateFieldProps {
 	label?: string;
@@ -14,13 +15,9 @@ interface DateFieldProps {
 export function DateField({ label, description }: DateFieldProps) {
 	const field = useFieldContext<Date | null>();
 
-	const errors = useStore(field.store, (state) =>
-		state.meta.errors.map(({ message }) => message),
+	const value = useStore(field.store, (state) =>
+		state.value ? parseDate(state.value.toISOString().split("T")[0]) : null,
 	);
-
-	const value = field.state.value
-		? parseDate(field.state.value.toISOString().split("T")[0])
-		: null;
 
 	return (
 		<div className="space-y-2">
@@ -43,11 +40,7 @@ export function DateField({ label, description }: DateFieldProps) {
 				</div>
 			</DatePicker>
 			{description && <Typography variant="muted">{description}</Typography>}
-			{errors && (
-				<Typography variant="small" className="text-destructive">
-					{errors.join(", ")}
-				</Typography>
-			)}
+			<FormMessage />
 		</div>
 	);
 }

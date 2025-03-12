@@ -7,14 +7,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { SortAscIcon, SortDescIcon } from "lucide-react";
-import { useQueryStates } from "nuqs";
-import { SortOptions, eventsFiltersParams } from "../search-params";
-
-export const useEventsFilters = () => {
-	const [filters, setFilters] = useQueryStates(eventsFiltersParams);
-
-	return { filters, setFilters };
-};
+import { SortOptions } from "../search-params";
+import { useEventsFilters } from "./use-filters";
 
 export function EventsFilters() {
 	const { filters, setFilters } = useEventsFilters();

@@ -4,16 +4,16 @@ import { Typography } from "@/components/typography";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTRPC } from "@/trpc/client/react";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import { useParams } from "next/navigation";
-import { useEventsFilters } from "../filters";
+import { useEventsFilters } from "../use-filters";
 import { EventCard, EventCardLoading } from "./card-item";
 
 interface EventListingProps {
 	isOwner: boolean;
 }
 
-export function EventListing({ isOwner }: EventListingProps) {
+export function EventsListing({ isOwner }: EventListingProps) {
 	const { id } = useParams<{ id: string }>();
 	const {
 		filters: { sort },
@@ -21,11 +21,11 @@ export function EventListing({ isOwner }: EventListingProps) {
 
 	const trpc = useTRPC();
 
-	const { data, isLoading, isError } = useQuery(
+	const { data, isFetching, isError } = useQuery(
 		trpc.events.getAll.queryOptions({ laneId: id, sort }),
 	);
 
-	if (isLoading) return <EventListingSkeleton />;
+	if (isFetching) return <EventListingSkeleton />;
 
 	if (isError)
 		return (
@@ -63,11 +63,11 @@ export function EventListing({ isOwner }: EventListingProps) {
 					<div className="flex items-center mb-4">
 						<div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
 							<span className="text-xs font-semibold">
-								{format(group.date, "MMM")}
+								{dayjs(group.date).format("MMM")}
 							</span>
 						</div>
 						<Typography variant="h3" className="ml-4 font-semibold">
-							{format(group.date, "MMMM yyyy")}
+							{dayjs(group.date).format("MMMM YYYY")}
 						</Typography>
 					</div>
 

@@ -1,5 +1,4 @@
 import { PrivateMemoryIcon, PublicMemoryIcon } from "@/components/icons";
-import type { MemoryLane } from "@/db/schema";
 
 type Visibility = MemoryLane["visibility"];
 

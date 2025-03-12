@@ -89,9 +89,9 @@ importers:
       clsx:
         specifier: 2.1.1
         version: 2.1.1
-      date-fns:
-        specifier: 4.1.0
-        version: 4.1.0
+      dayjs:
+        specifier: 1.11.13
+        version: 1.11.13
       dotenv-cli:
         specifier: 8.0.0
         version: 8.0.0
@@ -2191,8 +2191,8 @@ packages:
     resolution: {integrity: sha512-WboRycPNsVw3B3TL559F7kuBUM4d8CgMEvk6xEJlOp7OBPjt6G7z8WMWlD2rOFZLk6OYfFIUGsCOWzcQH9K2og==}
     engines: {node: '>= 6'}
 
-  date-fns@4.1.0:
-    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
+  dayjs@1.11.13:
+    resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
   debug@4.4.0:
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
@@ -5472,7 +5472,7 @@ snapshots:
 
   data-uri-to-buffer@3.0.1: {}
 
-  date-fns@4.1.0: {}
+  dayjs@1.11.13: {}
 
   debug@4.4.0:
     dependencies:

@@ -26,7 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useTRPC } from "@/trpc/client/react";
 import type { RouterOutputs } from "@/trpc/types";
 import { useMutation } from "@tanstack/react-query";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { EventCardEdit } from "./card-edit";
@@ -81,7 +81,7 @@ export function EventCard({ isOwner, ...props }: EventCardProps) {
 			<CardContent>
 				<CardTitle className="truncate">{props.title}</CardTitle>
 				<CardDescription>
-					{format(new Date(props.date), "MMM d, yyyy")}
+					{dayjs(props.date).format("MMM d, YYYY")}
 				</CardDescription>
 
 				<Typography>{props.description}</Typography>

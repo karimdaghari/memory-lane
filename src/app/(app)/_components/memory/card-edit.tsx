@@ -9,7 +9,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAppForm } from "@/hooks/forms";
-import { MemoryLanesInsertSchema } from "@/shared/schemas/memory-lanes-input";
+import { MemoryLanesInsertSchema } from "@/shared/schemas";
 import { useTRPC } from "@/trpc/client/react";
 import { useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
@@ -51,8 +51,12 @@ export function MemoryCardEdit({
 	const createMutation = useMutation(
 		trpc.memoryLanes.create.mutationOptions({
 			onSuccess: ({ id }) => {
+				toast.success("Memory lane updated");
 				handleOpenChange(false);
 				router.push(`/m/${id}`);
+			},
+			onError: () => {
+				toast.error("Failed to update memory lane");
 			},
 		}),
 	);
@@ -60,7 +64,11 @@ export function MemoryCardEdit({
 	const updateMutation = useMutation(
 		trpc.memoryLanes.update.mutationOptions({
 			onSuccess: () => {
+				toast.success("Memory lane updated");
 				handleOpenChange(false);
+			},
+			onError: () => {
+				toast.error("Failed to update memory lane");
 			},
 		}),
 	);
@@ -74,37 +82,11 @@ export function MemoryCardEdit({
 		validators: {
 			onSubmit: MemoryLanesInsertSchema,
 		},
-		onSubmit: async ({ value, formApi }) => {
-			if (value.id) {
-				return toast.promise(
-					updateMutation.mutateAsync(
-						{ id: value.id, ...value },
-						{
-							onSuccess: () => {
-								formApi.reset();
-							},
-						},
-					),
-					{
-						loading: "Updating memory lane...",
-						success: "Memory lane updated",
-						error: "Failed to update memory lane",
-					},
-				);
-			}
+		onSubmit: async ({ value }) => {
+			if (value.id)
+				return await updateMutation.mutateAsync({ id: value.id, ...value });
 
-			return toast.promise(
-				createMutation.mutateAsync(value, {
-					onSuccess: () => {
-						formApi.reset();
-					},
-				}),
-				{
-					loading: "Creating memory lane...",
-					success: "Memory lane created!",
-					error: "Failed to create memory lane",
-				},
-			);
+			return await createMutation.mutateAsync(value);
 		},
 	});
 
@@ -117,7 +99,7 @@ export function MemoryCardEdit({
 				<DialogTrigger asChild>{children}</DialogTrigger>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>{title || "Untitled"}</DialogTitle>
+						<DialogTitle>{title}</DialogTitle>
 						<DialogDescription>
 							{id ? "Edit Memory Lane" : "Create Memory Lane"}
 						</DialogDescription>

@@ -10,10 +10,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { useAppForm } from "@/hooks/forms";
-import {
-	type UpdateUserSchema,
-	updateUserSchema,
-} from "@/shared/schemas/update-user";
+import { type UpdateUserSchema, updateUserSchema } from "@/shared/schemas";
 import { useTRPC } from "@/trpc/client/react";
 
 interface SettingsDialogProps {
@@ -31,38 +28,39 @@ export function SettingsDialog({
 	const queryClient = useQueryClient();
 
 	const updateUserMutation = useMutation(
-		trpc.users.updateUser.mutationOptions(),
+		trpc.users.updateUser.mutationOptions({
+			onSuccess: async ({ message, success }) => {
+				if (!success) {
+					toast.error("Failed to update settings", {
+						description: message,
+					});
+					return;
+				}
+				// Invalidate queries to refresh user data
+				await queryClient.invalidateQueries({
+					queryKey: trpc.users.getUser.queryKey(),
+				});
+				toast.success("Settings updated successfully", {
+					description: message,
+				});
+
+				onOpenChange(false);
+			},
+			onError: (error) => {
+				toast.error("Failed to update settings", {
+					description: error.message,
+				});
+			},
+		}),
 	);
 
 	const form = useAppForm({
-		defaultValues: input,
+		defaultValues: input as UpdateUserSchema,
 		validators: {
 			onSubmit: updateUserSchema,
 		},
 		onSubmit: async ({ value }) => {
-			try {
-				const { success, message } = await updateUserMutation.mutateAsync({
-					name: value.name,
-				});
-
-				if (success) {
-					// Invalidate queries to refresh user data
-					await queryClient.invalidateQueries({
-						queryKey: trpc.users.getUser.queryKey(),
-					});
-					toast.success("Settings updated successfully", {
-						description: message,
-					});
-				} else {
-					toast.error("Failed to update settings", {
-						description: message,
-					});
-				}
-			} catch (_err) {
-				toast.error("Something went wrong", {
-					description: "Please try again later",
-				});
-			}
+			return await updateUserMutation.mutateAsync(value);
 		},
 	});
 

@@ -1,5 +1,5 @@
-import { MemoryLanes } from "@/db/schema";
-import { MemoryLanesInsertSchema } from "@/shared/schemas/memory-lanes-input";
+import { MemoryLaneSchema, MemoryLanes } from "@/db/schema";
+import { MemoryLanesInsertSchema } from "@/shared/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -11,7 +11,7 @@ import {
 import { deleteEvent } from "./events/delete-event";
 
 export const memoryLanesRouter = createTRPCRouter({
-	getAll: authProcedure.query(
+	getAll: authProcedure.output(MemoryLaneSchema.array()).query(
 		async ({
 			ctx: {
 				db,
@@ -35,6 +35,11 @@ export const memoryLanesRouter = createTRPCRouter({
 	),
 	getById: publicProcedure
 		.input(z.string().uuid())
+		.output(
+			MemoryLaneSchema.extend({
+				isOwner: z.boolean(),
+			}),
+		)
 		.query(async ({ ctx: { db, user }, input }) => {
 			try {
 				const data = await db.query.MemoryLanes.findFirst({
@@ -68,6 +73,9 @@ export const memoryLanesRouter = createTRPCRouter({
 		}),
 	checkHasAccess: publicProcedure
 		.input(z.string().uuid())
+		.output(
+			z.boolean().describe("Whether the user has access to the memory lane"),
+		)
 		.query(async ({ ctx: { db, user }, input }) => {
 			const data = await db.query.MemoryLanes.findFirst({
 				where: (f, op) => op.eq(f.id, input),
@@ -93,6 +101,7 @@ export const memoryLanesRouter = createTRPCRouter({
 		}),
 	create: authProcedure
 		.input(MemoryLanesInsertSchema.omit({ id: true }))
+		.output(MemoryLaneSchema)
 		.mutation(
 			async ({
 				ctx: {
@@ -122,6 +131,7 @@ export const memoryLanesRouter = createTRPCRouter({
 		),
 	update: authProcedure
 		.input(MemoryLanesInsertSchema.required({ id: true }))
+		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx: { db }, input: { id, ...input } }) => {
 			try {
 				await db.update(MemoryLanes).set(input).where(eq(MemoryLanes.id, id));
@@ -139,6 +149,7 @@ export const memoryLanesRouter = createTRPCRouter({
 		}),
 	delete: authProcedure
 		.input(z.object({ id: z.string().uuid() }))
+		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx: { db }, input }) => {
 			try {
 				const relatedEvents = await db.query.Events.findMany({

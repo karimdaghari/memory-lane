@@ -49,13 +49,14 @@ import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client/react";
 import type { RouterOutputs } from "@/trpc/types";
 import { useMutation } from "@tanstack/react-query";
-import { format } from "date-fns";
+import dayjs from "dayjs";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CopyButton } from "../copy-button";
 import { MemoryCardEdit } from "./card-edit";
+import { getMemoryLaneVisibilityIcon } from "./lib";
 
 type Input =
 	| RouterOutputs["memoryLanes"]["getById"]
@@ -113,6 +114,8 @@ export function MemoryCardItem({
 		},
 	];
 
+	const VisibilityIcon = getMemoryLaneVisibilityIcon(props.visibility);
+
 	return (
 		<Card
 			className={cn("rounded-lg", {
@@ -140,9 +143,12 @@ export function MemoryCardItem({
 			{location === "listing" && (
 				<CardHeader className="flex-row justify-between">
 					<div className="w-4/5">
-						<CardTitle className="truncate">{props.title}</CardTitle>
+						<CardTitle className="flex items-center gap-1 [&>svg]:size-4">
+							<span className="truncate">{props.title}</span>
+							{VisibilityIcon}
+						</CardTitle>
 						<CardDescription>
-							Created on {format(new Date(), "MMM d, yyyy")}
+							Created on {dayjs(props.createdAt).format("MMM d, YYYY")}
 						</CardDescription>
 					</div>
 					<DropdownMenu>
@@ -172,9 +178,12 @@ export function MemoryCardItem({
 
 			{location === "page" && (
 				<CardHeader className="text-center">
-					<CardTitle className="lg:text-4xl font-bold">{props.title}</CardTitle>
+					<CardTitle className="lg:text-4xl font-bold flex items-center gap-1 justify-center">
+						<span>{props.title}</span>
+						{VisibilityIcon}
+					</CardTitle>
 					<CardDescription>
-						Created on {format(new Date(), "MMM d, yyyy")}
+						Created on {dayjs(props.createdAt).format("MMM d, YYYY")}
 					</CardDescription>
 				</CardHeader>
 			)}

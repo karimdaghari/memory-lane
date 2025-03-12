@@ -10,7 +10,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAppForm } from "@/hooks/forms";
-import { EventsInsertSchema } from "@/shared/schemas/events-input";
+import { EventsInsertSchema } from "@/shared/schemas";
 import { useTRPC } from "@/trpc/client/react";
 import { useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
