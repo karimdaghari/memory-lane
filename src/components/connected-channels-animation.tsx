@@ -27,7 +27,7 @@ const Circle = forwardRef<
 
 Circle.displayName = "Circle";
 
-export function AnimatedBeamMultipleInput({
+export function ConnectedChannelsAnimation({
 	className,
 }: {
 	className?: string;

@@ -1,6 +1,6 @@
+import { ConnectedChannelsAnimation } from "@/components/connected-channels-animation";
 import { SparklesText } from "@/components/magicui/sparkles-text";
 import { TextAnimate } from "@/components/magicui/text-animate";
-import { AnimatedBeamMultipleInput } from "@/components/multi-input-beam";
 import { Typography } from "@/components/typography";
 
 export function Welcome() {
@@ -22,7 +22,7 @@ export function Welcome() {
 					</TextAnimate>
 				</div>
 			</div>
-			<AnimatedBeamMultipleInput />
+			<ConnectedChannelsAnimation />
 		</div>
 	);
 }
