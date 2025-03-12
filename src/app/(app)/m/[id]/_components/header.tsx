@@ -1,8 +1,8 @@
 "use client";
 import {
-	MemoryCardItem,
-	MemoryCardItemSkeletonPage,
-} from "@/app/(app)/_components/memory";
+	MemoryLaneCardItem,
+	MemoryLaneCardItemSkeletonPage,
+} from "@/app/(app)/_components/memory-lane";
 import { useTRPC } from "@/trpc/client/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
@@ -13,7 +13,7 @@ interface MemoryHeaderProps {
 
 export function MemoryHeader(props: MemoryHeaderProps) {
 	return (
-		<Suspense fallback={<MemoryCardItemSkeletonPage />}>
+		<Suspense fallback={<MemoryLaneCardItemSkeletonPage />}>
 			<Loader {...props} />
 		</Suspense>
 	);
@@ -24,5 +24,5 @@ function Loader({ id }: MemoryHeaderProps) {
 
 	const { data } = useSuspenseQuery(trpc.memoryLanes.getById.queryOptions(id));
 
-	return <MemoryCardItem location="page" {...data} />;
+	return <MemoryLaneCardItem location="page" {...data} />;
 }

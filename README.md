@@ -41,14 +41,66 @@ This first iteration focuses on a seamless user experience, leveraging Supabase 
 ### Technical Design
 
 - **Frontend**: Built with Next.js for server-side rendering and a smooth user experience. Key pages include a homepage for managing memory lanes and a detail page for viewing events in a timeline.
-- **API with tRPC**: The API leverages tRPC’s single-endpoint architecture with routers for:
+- **API with tRPC**: The API leverages tRPC's single-endpoint architecture with routers for:
   - No traditional REST verbs (GET/POST) are used; tRPC handles queries and mutations seamlessly.
 - **Data Model**:
-  - `MemoryLane`: `{ id, title, description, createdAt, userId, slug, visibility }`
-  - `Event`: `{ id, laneId, title, description, timestamp, imageUrl }`
+  - `MemoryLanes`: `{ id, title, description, createdAt, userId, visibility }`
+  - `Events`: `{ id, laneId, title, description, date, image }`
 - **Authentication**: Handled via Supabase Auth, ensuring only authenticated users can create and manage memory lanes.
 - **Image Handling**: Images are uploaded to Supabase Storage via a drag-and-drop interface, with URLs stored in the database for retrieval.
-- **Reusability**: Components like `EventCard`, `ImageUploader`, and ... are modular and reusable.
+- **Reusability**: Components like `EventCard`, `MemoryCardItem`, `UploaderField`, and more... are modular and -- where it makes sense -- reusable.
+
+### Folder Structure
+
+The project follows a modular, feature-oriented structure that optimizes for code colocation and maintainability:
+
+```
+memory-lane/
+├── src/                     # Main source code
+│   ├── app/                 # Next.js App Router structure
+│   │   ├── (app)/           # Main app routes (protected)
+│   │   ├── api/             # API routes, including tRPC
+│   │   ├── auth/            # Authentication-related routes
+│   │   └── styles/          # Global styles
+│   ├── auth/                # Authentication utilities and types (Supabase)
+│   ├── components/          # Reusable UI components
+│   │   ├── fields/          # Form field components
+│   │   ├── magicui/         # Animation and UI effects
+│   │   ├── navbar/          # Navigation components
+│   │   └── ui/              # Core UI components (shadcn-based)
+│   ├── db/                  # Database configuration and models
+│   │   ├── migrations/      # Schema migrations
+│   │   └── models/          # Database models and types
+│   ├── env/                 # Type-Safe Environment variables
+│   ├── hooks/               # Custom React hooks
+│   ├── lib/                 # Utility functions and helpers
+│   ├── shared/              # Shared types and utilities
+│   ├── supabase/            # Supabase client and utilities
+│   └── trpc/                # tRPC configuration
+│       ├── client/          # Client-side setup
+│       ├── lib/             # Core tRPC utilities
+│       └── routers/         # API route definitions
+└── ... (config files)
+```
+
+#### Design Principles
+
+- **Modularity First**: The structure is designed with modularity in mind, making it easy to:
+  - Find related code quickly (code colocation)
+  - Add new features without disrupting existing ones
+  - Transition to a monorepo architecture if needed in the future
+
+- **Feature Colocation**: Code that works together stays together:
+  - Components are organized by feature or purpose rather than type
+  - API endpoints live close to their related business logic
+  - Database models are organized alongside their migrations
+
+- **Avoiding Overgeneralization**: Rather than creating excessive abstraction layers:
+  - Components are purpose-built for their specific use case
+  - Utilities are only extracted when reused in multiple places
+  - Each directory has a clear, single responsibility
+
+This approach balances flexibility with maintainability, allowing the codebase to grow naturally while keeping cognitive overhead low for developers.
 
 ### UI Screenshots
 

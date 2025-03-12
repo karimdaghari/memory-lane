@@ -1,3 +1,4 @@
+import { LoadingIcon } from "@/components/icons";
 import "./styles/globals.css";
 import { env } from "@/env/server";
 import { TRPCReactProvider } from "@/trpc/client/react";
@@ -37,7 +38,14 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						<NuqsAdapter>{children}</NuqsAdapter>
-						<Toaster richColors position="top-right" closeButton />
+						<Toaster
+							richColors
+							position="top-right"
+							closeButton
+							icons={{
+								loading: <LoadingIcon />,
+							}}
+						/>
 					</ThemeProvider>
 				</TRPCReactProvider>
 			</body>

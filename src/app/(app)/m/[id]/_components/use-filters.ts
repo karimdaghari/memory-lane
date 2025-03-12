@@ -1,8 +1,8 @@
 import { useQueryStates } from "nuqs";
-import { eventsFiltersParams } from "../search-params";
+import { memoriesFiltersParams } from "../search-params";
 
-export function useEventsFilters() {
-	const [filters, setFilters] = useQueryStates(eventsFiltersParams);
+export function useMemoriesFilters() {
+	const [filters, setFilters] = useQueryStates(memoriesFiltersParams);
 
 	return { filters, setFilters };
 }

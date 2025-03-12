@@ -27,7 +27,7 @@ export interface Props extends Partial<MemoryLanesInsertSchema> {
 	onOpenChange?: (open: boolean) => void;
 }
 
-export function MemoryCardEdit({
+export function MemoryLaneCardEdit({
 	children,
 	open = false,
 	onOpenChange,
@@ -51,12 +51,12 @@ export function MemoryCardEdit({
 	const createMutation = useMutation(
 		trpc.memoryLanes.create.mutationOptions({
 			onSuccess: ({ id }) => {
-				toast.success("Memory lane updated");
+				toast.success("Memory lane created");
 				handleOpenChange(false);
 				router.push(`/m/${id}`);
 			},
 			onError: () => {
-				toast.error("Failed to update memory lane");
+				toast.error("Failed to create memory lane");
 			},
 		}),
 	);
@@ -82,11 +82,22 @@ export function MemoryCardEdit({
 		validators: {
 			onSubmit: MemoryLanesInsertSchema,
 		},
-		onSubmit: async ({ value }) => {
+		onSubmit: async ({ value, formApi }) => {
 			if (value.id)
-				return await updateMutation.mutateAsync({ id: value.id, ...value });
+				return await updateMutation.mutateAsync(
+					{ id: value.id, ...value },
+					{
+						onSuccess: () => {
+							formApi.reset();
+						},
+					},
+				);
 
-			return await createMutation.mutateAsync(value);
+			return await createMutation.mutateAsync(value, {
+				onSuccess: () => {
+					formApi.reset();
+				},
+			});
 		},
 	});
 
@@ -157,7 +168,7 @@ export function MemoryCardEdit({
 
 					<DialogFooter className="flex justify-end">
 						<form.SubmitButton form="lane-card-form">
-							{input.id ? "Update" : "Create"}
+							{input.id ? "Update memory lane" : "Create memory lane"}
 						</form.SubmitButton>
 					</DialogFooter>
 				</DialogContent>

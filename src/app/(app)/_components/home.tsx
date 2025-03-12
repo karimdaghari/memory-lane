@@ -1,8 +1,8 @@
-import { MemoryCardEdit } from "@/app/(app)/_components/memory";
+import { MemoryLaneCardEdit } from "@/app/(app)/_components/memory-lane";
 import { NewIcon } from "@/components/icons";
 import { Typography } from "@/components/typography";
 import { Button } from "@/components/ui/button";
-import { MemoryLanesListing } from "./memory/listing";
+import { MemoryLanesListing } from "./memory-lane/listing";
 
 export function Home() {
 	return (
@@ -15,12 +15,12 @@ export function Home() {
 			</div>
 
 			<div className="flex justify-end">
-				<MemoryCardEdit>
+				<MemoryLaneCardEdit>
 					<Button>
 						<NewIcon />
-						Create a new memory lane
+						Create new lane
 					</Button>
-				</MemoryCardEdit>
+				</MemoryLaneCardEdit>
 			</div>
 
 			<MemoryLanesListing />

@@ -29,15 +29,15 @@ import { useMutation } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { toast } from "sonner";
-import { EventCardEdit } from "./card-edit";
+import { MemoryCardEdit } from "./card-edit";
 
-type Input = RouterOutputs["events"]["getAll"]["events"][number];
+type Input = RouterOutputs["memories"]["getAll"]["memories"][number];
 
-interface EventCardProps extends Input {
+interface MemoryCardProps extends Input {
 	isOwner: boolean;
 }
 
-export function EventCard({ isOwner, ...props }: EventCardProps) {
+export function MemoryCard({ isOwner, ...props }: MemoryCardProps) {
 	const [openDelete, setOpenDelete] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
 
@@ -63,13 +63,13 @@ export function EventCard({ isOwner, ...props }: EventCardProps) {
 
 	return (
 		<Card className="rounded-lg">
-			<EventCardDelete
+			<MemoryCardDelete
 				title={props.title}
 				id={props.id}
 				open={openDelete}
 				onOpenChange={setOpenDelete}
 			/>
-			<EventCardEdit {...props} open={openEdit} onOpenChange={setOpenEdit} />
+			<MemoryCardEdit {...props} open={openEdit} onOpenChange={setOpenEdit} />
 			<CardHeader>
 				<img
 					src={props.image}
@@ -81,7 +81,7 @@ export function EventCard({ isOwner, ...props }: EventCardProps) {
 			<CardContent>
 				<CardTitle className="truncate">{props.title}</CardTitle>
 				<CardDescription>
-					{dayjs(props.date).format("MMM d, YYYY")}
+					{dayjs(props.date).format("MMM D, YYYY")}
 				</CardDescription>
 
 				<Typography>{props.description}</Typography>
@@ -106,7 +106,7 @@ export function EventCard({ isOwner, ...props }: EventCardProps) {
 	);
 }
 
-export function EventCardLoading() {
+export function MemoryCardSkeleton() {
 	return (
 		<Card>
 			<CardHeader>
@@ -125,28 +125,28 @@ export function EventCardLoading() {
 	);
 }
 
-interface EventCardDeleteProps {
+interface MemoryCardDeleteProps {
 	title: string;
 	id: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-function EventCardDelete({
+function MemoryCardDelete({
 	title,
 	open,
 	onOpenChange,
 	id,
-}: EventCardDeleteProps) {
+}: MemoryCardDeleteProps) {
 	const trpc = useTRPC();
 
-	const deleteMutation = useMutation(trpc.events.delete.mutationOptions());
+	const deleteMutation = useMutation(trpc.memories.delete.mutationOptions());
 
-	const deleteEvent = async () => {
+	const deleteMemory = async () => {
 		return toast.promise(deleteMutation.mutateAsync({ id }), {
-			loading: "Deleting event...",
-			success: "Event deleted",
-			error: "Failed to delete event",
+			loading: "Deleting memory...",
+			success: "Memory deleted",
+			error: "Failed to delete memory",
 		});
 	};
 
@@ -156,7 +156,7 @@ function EventCardDelete({
 				<AlertDialogHeader>
 					<AlertDialogTitle>You're about to delete {title}</AlertDialogTitle>
 					<AlertDialogDescription>
-						This action is irreversible. You will be deleting this event along
+						This action is irreversible. You will be deleting this memory along
 						with the attached image.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
@@ -165,7 +165,7 @@ function EventCardDelete({
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
 					<AlertDialogAction
 						className={buttonVariants({ variant: "destructive" })}
-						onClick={deleteEvent}
+						onClick={deleteMemory}
 					>
 						Delete
 					</AlertDialogAction>

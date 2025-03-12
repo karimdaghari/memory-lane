@@ -1,12 +1,12 @@
-CREATE TABLE "events" (
+CREATE TABLE "memories" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	"lane_id" uuid NOT NULL,
 	"title" text NOT NULL,
 	"date" timestamp NOT NULL,
-	"description" text,
-	"image" text
+	"image" text NOT NULL,
+	"description" text
 );
 --> statement-breakpoint
 CREATE TABLE "memory_lanes" (
@@ -16,8 +16,7 @@ CREATE TABLE "memory_lanes" (
 	"user_id" text NOT NULL,
 	"title" text NOT NULL,
 	"description" text,
-	"visibility" varchar DEFAULT 'private',
-	"slug" text NOT NULL
+	"visibility" varchar DEFAULT 'private' NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "events" ADD CONSTRAINT "events_lane_id_memory_lanes_id_fk" FOREIGN KEY ("lane_id") REFERENCES "public"."memory_lanes"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "memories" ADD CONSTRAINT "memories_lane_id_memory_lanes_id_fk" FOREIGN KEY ("lane_id") REFERENCES "public"."memory_lanes"("id") ON DELETE cascade ON UPDATE no action;

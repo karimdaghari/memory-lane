@@ -1,10 +1,10 @@
 import type { DB } from "@/db/client";
-import { Events } from "@/db/schema";
+import { Memories } from "@/db/schema";
 import { deleteImages } from "@/supabase/storage.server";
 import { TRPCError } from "@trpc/server";
 import { inArray } from "drizzle-orm";
 
-interface DeleteEventProps {
+interface DeleteMemoryProps {
 	db: DB;
 	input: {
 		id?: string;
@@ -12,10 +12,10 @@ interface DeleteEventProps {
 	};
 }
 
-export async function deleteEvent({
+export async function deleteMemory({
 	db,
 	input: { id, ids },
-}: DeleteEventProps) {
+}: DeleteMemoryProps) {
 	const input = (Array.isArray(ids) ? ids : [id]).filter(
 		(i) => i !== undefined,
 	);
@@ -27,17 +27,17 @@ export async function deleteEvent({
 		});
 	}
 
-	const events = await db.query.Events.findMany({
-		where: (f, op) => op.and(op.isNotNull(f.image), op.inArray(f.id, input)),
+	const memories = await db.query.Memories.findMany({
+		where: (f, op) => op.inArray(f.id, input),
 		columns: {
 			image: true,
 		},
 	});
 
-	const images = events.map((event) => event.image as string);
+	const images = memories.map(({ image }) => image);
 
 	await Promise.all([
-		db.delete(Events).where(inArray(Events.id, input)),
+		db.delete(Memories).where(inArray(Memories.id, input)),
 		deleteImages(images),
 	]);
 }

@@ -3,7 +3,7 @@ import { createSelectSchema } from "drizzle-zod";
 import { BaseColumns } from "./_base";
 import { MemoryLanes } from "./memory-lanes";
 
-export const Events = pgTable("events", {
+export const Memories = pgTable("memories", {
 	...BaseColumns,
 	laneId: uuid()
 		.references(() => MemoryLanes.id, {
@@ -16,4 +16,4 @@ export const Events = pgTable("events", {
 	description: text(),
 });
 
-export const EventsSelectSchema = createSelectSchema(Events);
+export const MemoriesSelectSchema = createSelectSchema(Memories);

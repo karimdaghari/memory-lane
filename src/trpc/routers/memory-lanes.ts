@@ -8,7 +8,7 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from "../lib/procedures";
-import { deleteEvent } from "./events/delete-event";
+import { deleteMemory } from "./memories/delete-event";
 
 export const memoryLanesRouter = createTRPCRouter({
 	getAll: authProcedure.output(MemoryLaneSchema.array()).query(
@@ -152,16 +152,16 @@ export const memoryLanesRouter = createTRPCRouter({
 		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx: { db }, input }) => {
 			try {
-				const relatedEvents = await db.query.Events.findMany({
+				const relatedMemories = await db.query.Memories.findMany({
 					where: (f, op) => op.eq(f.laneId, input.id),
 					columns: {
 						id: true,
 					},
 				});
 
-				const relatedEventsIds = relatedEvents.map((event) => event.id);
+				const relatedMemoriesIds = relatedMemories.map(({ id }) => id);
 
-				await deleteEvent({ db, input: { ids: relatedEventsIds } });
+				await deleteMemory({ db, input: { ids: relatedMemoriesIds } });
 
 				await db.delete(MemoryLanes).where(eq(MemoryLanes.id, input.id));
 

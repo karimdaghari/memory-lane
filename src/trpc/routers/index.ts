@@ -1,13 +1,13 @@
 import { createCallerFactory } from "../lib/init";
 import { createTRPCRouter } from "../lib/procedures";
-import { eventsRouter } from "./events/router";
+import { memoriesRouter } from "./memories/router";
 import { memoryLanesRouter } from "./memory-lanes";
 import { usersRouter } from "./users";
 
 export const appRouter = createTRPCRouter({
 	users: usersRouter,
 	memoryLanes: memoryLanesRouter,
-	events: eventsRouter,
+	memories: memoriesRouter,
 });
 
 // export type definition of API

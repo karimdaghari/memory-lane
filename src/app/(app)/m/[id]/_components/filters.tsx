@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/select";
 import { SortAscIcon, SortDescIcon } from "lucide-react";
 import { SortOptions } from "../search-params";
-import { useEventsFilters } from "./use-filters";
+import { useMemoriesFilters } from "./use-filters";
 
-export function EventsFilters() {
-	const { filters, setFilters } = useEventsFilters();
+export function MemoriesFilters() {
+	const { filters, setFilters } = useMemoriesFilters();
 
 	const options = SortOptions.map((value) => ({
 		icon: value === "desc" ? SortDescIcon : SortAscIcon,

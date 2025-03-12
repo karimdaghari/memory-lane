@@ -7,26 +7,26 @@ import type { RouterOutputs } from "@/trpc/types";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
-import { useEventsFilters } from "../use-filters";
-import { EventCard, EventCardLoading } from "./card-item";
+import { useMemoriesFilters } from "../use-filters";
+import { MemoryCard, MemoryCardSkeleton } from "./card-item";
 
-interface EventListingProps {
+interface MemoriesListingProps {
 	isOwner: boolean;
 }
 
-export function EventsListing({ isOwner }: EventListingProps) {
+export function MemoriesListing({ isOwner }: MemoriesListingProps) {
 	const { id } = useParams<{ id: string }>();
 	const {
 		filters: { sort },
-	} = useEventsFilters();
+	} = useMemoriesFilters();
 
 	const trpc = useTRPC();
 
 	const { data, isFetching, isError } = useQuery(
-		trpc.events.getAll.queryOptions({ laneId: id, sort }),
+		trpc.memories.getAll.queryOptions({ laneId: id, sort }),
 	);
 
-	if (isFetching) return <EventListingSkeleton />;
+	if (isFetching) return <MemoriesListingSkeleton />;
 
 	if (isError)
 		return (
@@ -38,37 +38,41 @@ export function EventsListing({ isOwner }: EventListingProps) {
 			</Alert>
 		);
 
-	if (!data?.groupedEvents.length)
+	if (!data?.groupedMemories.length)
 		return (
 			<Typography variant="muted" className="text-center">
 				{isOwner
-					? "You don't have any events yet. Create one to get started!"
-					: "There are no events in this memory lane yet."}
+					? "You don't have any memories yet. Create one to get started!"
+					: "There are no memories in this memory lane yet."}
 			</Typography>
 		);
 
 	return (
-		<EventsTimeline groupedEvents={data.groupedEvents} isOwner={isOwner} />
+		<MemoriesTimeline
+			groupedMemories={data.groupedMemories}
+			isOwner={isOwner}
+		/>
 	);
 }
 
-type GroupedEvent = RouterOutputs["events"]["getAll"]["groupedEvents"][number];
+type GroupedMemory =
+	RouterOutputs["memories"]["getAll"]["groupedMemories"][number];
 
-interface EventsTimelineProps {
-	groupedEvents: GroupedEvent[];
+interface MemoriesTimelineProps {
+	groupedMemories: GroupedMemory[];
 	isOwner: boolean;
 }
 
-function EventsTimeline({ groupedEvents, isOwner }: EventsTimelineProps) {
+function MemoriesTimeline({ groupedMemories, isOwner }: MemoriesTimelineProps) {
 	return (
 		<div className="space-y-8">
-			{groupedEvents.map((group, index) => (
+			{groupedMemories.map((group, index) => (
 				<div key={group.date.toISOString()} className="relative">
 					{/* Timeline with connector line */}
 					<div
 						className="absolute left-4 top-8 bottom-0 w-0.5 bg-muted-foreground/30"
 						style={{
-							display: index === groupedEvents.length - 1 ? "none" : "block",
+							display: index === groupedMemories.length - 1 ? "none" : "block",
 						}}
 					/>
 
@@ -84,10 +88,10 @@ function EventsTimeline({ groupedEvents, isOwner }: EventsTimelineProps) {
 						</Typography>
 					</div>
 
-					{/* Events for this month */}
+					{/* Memories for this month */}
 					<div className="ml-12 space-y-4">
-						{group.events.map((event) => (
-							<EventCard key={event.id} {...event} isOwner={isOwner} />
+						{group.memories.map((memory) => (
+							<MemoryCard key={memory.id} {...memory} isOwner={isOwner} />
 						))}
 					</div>
 				</div>
@@ -96,7 +100,7 @@ function EventsTimeline({ groupedEvents, isOwner }: EventsTimelineProps) {
 	);
 }
 
-function EventListingSkeleton() {
+function MemoriesListingSkeleton() {
 	return (
 		<div className="space-y-8">
 			{Array.from({ length: 2 }).map((_, groupIndex) => (
@@ -114,11 +118,11 @@ function EventListingSkeleton() {
 						<div className="ml-4 h-7 w-40 bg-muted rounded animate-pulse" />
 					</div>
 
-					{/* Events for this month - Skeleton */}
+					{/* Memories for this month - Skeleton */}
 					<div className="ml-12 space-y-4">
 						{Array.from({ length: 2 }).map((_, index) => (
 							// biome-ignore lint/suspicious/noArrayIndexKey: this is fine
-							<EventCardLoading key={index} />
+							<MemoryCardSkeleton key={index} />
 						))}
 					</div>
 				</div>

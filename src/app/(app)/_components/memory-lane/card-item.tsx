@@ -45,6 +45,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/client/react";
 import type { RouterOutputs } from "@/trpc/types";
@@ -55,14 +61,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CopyButton } from "../copy-button";
-import { MemoryCardEdit } from "./card-edit";
-import { getMemoryLaneVisibilityIcon } from "./lib";
+import { MemoryLaneCardEdit } from "./card-edit";
+import {
+	type Visibility,
+	getMemoryLaneVisibilityIcon,
+	getMemoryLaneVisibilityLabel,
+} from "./lib";
 
 type Input =
 	| RouterOutputs["memoryLanes"]["getById"]
 	| RouterOutputs["memoryLanes"]["getAll"][number];
 
-type MemoryCardItemProps = Input & {
+type MemoryLaneCardItemProps = Input & {
 	/**
 	 * The location of the card
 	 * @default "listing"
@@ -77,11 +87,11 @@ type MemoryCardItemProps = Input & {
 	isOwner?: boolean;
 };
 
-export function MemoryCardItem({
+export function MemoryLaneCardItem({
 	location = "listing",
 	isOwner = true,
 	...props
-}: MemoryCardItemProps) {
+}: MemoryLaneCardItemProps) {
 	const [openDelete, setOpenDelete] = useState(false);
 	const [openEdit, setOpenEdit] = useState(false);
 	const [openShare, setOpenShare] = useState(false);
@@ -114,8 +124,6 @@ export function MemoryCardItem({
 		},
 	];
 
-	const VisibilityIcon = getMemoryLaneVisibilityIcon(props.visibility);
-
 	return (
 		<Card
 			className={cn("rounded-lg", {
@@ -123,17 +131,21 @@ export function MemoryCardItem({
 					location === "page",
 			})}
 		>
-			<MemoryCardDelete
+			<MemoryLaneCardDelete
 				title={props.title}
 				id={props.id}
 				open={openDelete}
 				onOpenChange={setOpenDelete}
 			/>
 
-			<MemoryCardEdit {...props} open={openEdit} onOpenChange={setOpenEdit} />
+			<MemoryLaneCardEdit
+				{...props}
+				open={openEdit}
+				onOpenChange={setOpenEdit}
+			/>
 
 			{props.visibility === "public" && (
-				<MemoryCardShare
+				<MemoryLaneCardShare
 					value={`${window.origin}/m/${props.id}`}
 					open={openShare}
 					onOpenChange={setOpenShare}
@@ -143,12 +155,12 @@ export function MemoryCardItem({
 			{location === "listing" && (
 				<CardHeader className="flex-row justify-between">
 					<div className="w-4/5">
-						<CardTitle className="flex items-center gap-1 [&>svg]:size-4">
+						<CardTitle className="flex items-center gap-1 [&_svg]:size-4">
 							<span className="truncate">{props.title}</span>
-							{VisibilityIcon}
+							<VisibilityIndicator visibility={props.visibility} />
 						</CardTitle>
 						<CardDescription>
-							Created on {dayjs(props.createdAt).format("MMM d, YYYY")}
+							Created on {dayjs(props.createdAt).format("MMM D, YYYY")}
 						</CardDescription>
 					</div>
 					<DropdownMenu>
@@ -180,10 +192,10 @@ export function MemoryCardItem({
 				<CardHeader className="text-center">
 					<CardTitle className="lg:text-4xl font-bold flex items-center gap-1 justify-center">
 						<span>{props.title}</span>
-						{VisibilityIcon}
+						<VisibilityIndicator visibility={props.visibility} />
 					</CardTitle>
 					<CardDescription>
-						Created on {dayjs(props.createdAt).format("MMM d, YYYY")}
+						Created on {dayjs(props.createdAt).format("MMM D, YYYY")}
 					</CardDescription>
 				</CardHeader>
 			)}
@@ -228,7 +240,23 @@ export function MemoryCardItem({
 	);
 }
 
-export function MemoryCardItemSkeletonListing() {
+function VisibilityIndicator({ visibility }: { visibility: Visibility }) {
+	const icon = getMemoryLaneVisibilityIcon(visibility);
+	const label = getMemoryLaneVisibilityLabel(visibility);
+
+	return (
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<span>{icon}</span>
+				</TooltipTrigger>
+				<TooltipContent>{label}</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
+	);
+}
+
+export function MemoryLaneCardItemSkeletonListing() {
 	return (
 		<Card>
 			<CardHeader className="flex-row justify-between">
@@ -245,7 +273,7 @@ export function MemoryCardItemSkeletonListing() {
 	);
 }
 
-export function MemoryCardItemSkeletonPage() {
+export function MemoryLaneCardItemSkeletonPage() {
 	return (
 		<Card className="rounded-none p-0 border-none shadow-none">
 			<CardHeader className="flex flex-col items-center justify-center w-full">
@@ -265,19 +293,19 @@ export function MemoryCardItemSkeletonPage() {
 	);
 }
 
-interface MemoryCardDeleteProps {
+interface MemoryLaneCardDeleteProps {
 	title: string;
 	id: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 }
 
-function MemoryCardDelete({
+function MemoryLaneCardDelete({
 	title,
 	open,
 	onOpenChange,
 	id,
-}: MemoryCardDeleteProps) {
+}: MemoryLaneCardDeleteProps) {
 	const router = useRouter();
 	const trpc = useTRPC();
 
@@ -323,19 +351,19 @@ function MemoryCardDelete({
 	);
 }
 
-interface MemoryCardShareProps {
+interface MemoryLaneCardShareProps {
 	children?: React.ReactNode;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 	value: string;
 }
 
-function MemoryCardShare({
+function MemoryLaneCardShare({
 	children,
 	open,
 	onOpenChange,
 	value,
-}: MemoryCardShareProps) {
+}: MemoryLaneCardShareProps) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogTrigger asChild>{children}</DialogTrigger>

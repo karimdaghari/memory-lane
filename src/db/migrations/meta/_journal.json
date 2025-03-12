@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1741708683596,
-      "tag": "0000_freezing_lorna_dane",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1741729524712,
-      "tag": "0001_giant_wallop",
+      "when": 1741742516597,
+      "tag": "0000_faithful_gressill",
       "breakpoints": true
     }
   ]

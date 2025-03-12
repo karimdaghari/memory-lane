@@ -1,14 +1,14 @@
 import { relations } from "drizzle-orm";
-import { Events } from "./models/events";
+import { Memories } from "./models/memories";
 import { MemoryLanes } from "./models/memory-lanes";
 
 export const memoryLaneRelations = relations(MemoryLanes, ({ many }) => ({
-	events: many(Events),
+	events: many(Memories),
 }));
 
-export const eventRelations = relations(Events, ({ one }) => ({
+export const eventRelations = relations(Memories, ({ one }) => ({
 	lane: one(MemoryLanes, {
-		fields: [Events.laneId],
+		fields: [Memories.laneId],
 		references: [MemoryLanes.id],
 	}),
 }));

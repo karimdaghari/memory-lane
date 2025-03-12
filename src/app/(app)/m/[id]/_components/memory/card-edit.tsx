@@ -10,20 +10,21 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAppForm } from "@/hooks/forms";
-import { EventsInsertSchema } from "@/shared/schemas";
+import { MemoriesInsertSchema } from "@/shared/schemas";
 import { useTRPC } from "@/trpc/client/react";
 import { useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useState } from "react";
 import { toast } from "sonner";
-interface Props extends Partial<EventsInsertSchema> {
+
+interface Props extends Partial<MemoriesInsertSchema> {
 	children?: React.ReactNode;
 	open?: boolean;
 	onOpenChange?: (open: boolean) => void;
 }
 
-export function EventCardEdit({
+export function MemoryCardEdit({
 	children,
 	open = false,
 	onOpenChange,
@@ -43,17 +44,25 @@ export function EventCardEdit({
 	}
 
 	const createMutation = useMutation(
-		trpc.events.create.mutationOptions({
+		trpc.memories.create.mutationOptions({
 			onSuccess: () => {
 				handleOpenChange(false);
+				toast.success("Memory created");
+			},
+			onError: () => {
+				toast.error("Failed to create memory");
 			},
 		}),
 	);
 
 	const updateMutation = useMutation(
-		trpc.events.update.mutationOptions({
+		trpc.memories.update.mutationOptions({
 			onSuccess: () => {
 				handleOpenChange(false);
+				toast.success("Memory updated");
+			},
+			onError: () => {
+				toast.error("Failed to update memory");
 			},
 		}),
 	);
@@ -62,41 +71,27 @@ export function EventCardEdit({
 		defaultValues: {
 			...input,
 			title: input.title ?? "Untitled",
-		} as EventsInsertSchema,
+		} as MemoriesInsertSchema,
 		validators: {
-			onSubmit: EventsInsertSchema,
+			onSubmit: MemoriesInsertSchema,
 		},
 		onSubmit: async ({ value, formApi }) => {
 			if (value.id) {
-				return toast.promise(
-					updateMutation.mutateAsync(
-						{ id: value.id, ...value },
-						{
-							onSuccess: () => {
-								formApi.reset();
-							},
-						},
-					),
+				return await updateMutation.mutateAsync(
+					{ id: value.id, ...value },
 					{
-						loading: "Updating event...",
-						success: "Event updated",
-						error: "Failed to update event",
+						onSuccess: () => {
+							formApi.reset();
+						},
 					},
 				);
 			}
 
-			return toast.promise(
-				createMutation.mutateAsync(value, {
-					onSuccess: () => {
-						formApi.reset();
-					},
-				}),
-				{
-					loading: "Creating event...",
-					success: "Event created",
-					error: "Failed to create event",
+			return await createMutation.mutateAsync(value, {
+				onSuccess: () => {
+					formApi.reset();
 				},
-			);
+			});
 		},
 	});
 
@@ -111,7 +106,7 @@ export function EventCardEdit({
 					<DialogHeader>
 						<DialogTitle>{title || "Untitled"}</DialogTitle>
 						<DialogDescription>
-							{id ? "Edit Event" : "Create Event"}
+							{id ? "Edit memory" : "Create memory"}
 						</DialogDescription>
 					</DialogHeader>
 
@@ -135,7 +130,7 @@ export function EventCardEdit({
 						<form.AppField
 							name="title"
 							children={(field) => (
-								<field.TextField label="Title" placeholder="Event Title" />
+								<field.TextField label="Title" placeholder="Memory Title" />
 							)}
 						/>
 						<form.AppField
@@ -143,7 +138,7 @@ export function EventCardEdit({
 							children={(field) => (
 								<field.TextareaField
 									label="Description"
-									placeholder="Event Description"
+									placeholder="Memory Description"
 								/>
 							)}
 						/>
@@ -151,7 +146,7 @@ export function EventCardEdit({
 
 					<DialogFooter className="flex justify-end">
 						<form.SubmitButton form="event-card-form">
-							{id ? "Update" : "Create"}
+							{id ? "Update memory" : "Create memory"}
 						</form.SubmitButton>
 					</DialogFooter>
 				</DialogContent>

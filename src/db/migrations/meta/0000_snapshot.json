@@ -1,11 +1,11 @@
 {
-  "id": "906c4888-e826-42c5-a5d1-e76897f47ae0",
+  "id": "5089a9ac-c5f5-452d-ba13-bad9647cc692",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.events": {
-      "name": "events",
+    "public.memories": {
+      "name": "memories",
       "schema": "",
       "columns": {
         "id": {
@@ -46,14 +46,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "image": {
           "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -61,9 +61,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "events_lane_id_memory_lanes_id_fk": {
-          "name": "events_lane_id_memory_lanes_id_fk",
-          "tableFrom": "events",
+        "memories_lane_id_memory_lanes_id_fk": {
+          "name": "memories_lane_id_memory_lanes_id_fk",
+          "tableFrom": "memories",
           "tableTo": "memory_lanes",
           "columnsFrom": [
             "lane_id"
@@ -127,14 +127,8 @@
           "name": "visibility",
           "type": "varchar",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'private'"
-        },
-        "slug": {
-          "name": "slug",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},

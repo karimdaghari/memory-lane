@@ -1,5 +1,5 @@
-import { Events, EventsSelectSchema } from "@/db/schema";
-import { EventsInsertSchema } from "@/shared/schemas";
+import { Memories, MemoriesSelectSchema } from "@/db/schema";
+import { MemoriesInsertSchema } from "@/shared/schemas";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
@@ -8,9 +8,9 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from "../../lib/procedures";
-import { deleteEvent } from "./delete-event";
+import { deleteMemory } from "./delete-event";
 
-export const eventsRouter = createTRPCRouter({
+export const memoriesRouter = createTRPCRouter({
 	/**
 	 * Get all events for a memory lane, sorted and grouped by month/year.
 	 *
@@ -73,11 +73,11 @@ export const eventsRouter = createTRPCRouter({
 		)
 		.output(
 			z.object({
-				events: EventsSelectSchema.array(),
-				groupedEvents: z.array(
+				memories: MemoriesSelectSchema.array(),
+				groupedMemories: z.array(
 					z.object({
 						date: z.date(),
-						events: EventsSelectSchema.array(),
+						memories: MemoriesSelectSchema.array(),
 					}),
 				),
 			}),
@@ -95,16 +95,16 @@ export const eventsRouter = createTRPCRouter({
 					});
 				}
 
-				const events = await db.query.Events.findMany({
+				const memories = await db.query.Memories.findMany({
 					where: (f, op) => op.eq(f.laneId, laneId),
 					orderBy: (f, op) =>
 						sort === "desc" ? op.desc(f.date) : op.asc(f.date),
 				});
 
 				// Group events by month/year
-				const groupedEventsMap = events.reduce(
-					(acc, event) => {
-						const date = event.date;
+				const groupedMemoriesMap = memories.reduce(
+					(acc, memory) => {
+						const date = memory.date;
 						// Create a new Date object set to the first of the month
 						const monthDate = new Date(date.getFullYear(), date.getMonth(), 1);
 						const key = monthDate.toISOString();
@@ -112,26 +112,28 @@ export const eventsRouter = createTRPCRouter({
 						if (!acc[key]) {
 							acc[key] = {
 								date: monthDate,
-								events: [],
+								memories: [],
 							};
 						}
 
-						acc[key].events.push(event);
+						acc[key].memories.push(memory);
 						return acc;
 					},
-					{} as Record<string, { date: Date; events: typeof events }>,
+					{} as Record<string, { date: Date; memories: typeof memories }>,
 				);
 
 				// Convert to array and sort
-				const groupedEvents = Object.values(groupedEventsMap).sort((a, b) => {
-					return sort === "desc"
-						? b.date.getTime() - a.date.getTime()
-						: a.date.getTime() - b.date.getTime();
-				});
+				const groupedMemories = Object.values(groupedMemoriesMap).sort(
+					(a, b) => {
+						return sort === "desc"
+							? b.date.getTime() - a.date.getTime()
+							: a.date.getTime() - b.date.getTime();
+					},
+				);
 
 				return {
-					events,
-					groupedEvents,
+					memories,
+					groupedMemories,
 				};
 			} catch (err) {
 				throw new TRPCError({
@@ -143,14 +145,14 @@ export const eventsRouter = createTRPCRouter({
 		}),
 	create: authProcedure
 		.input(
-			EventsInsertSchema.omit({ id: true }).required({
+			MemoriesInsertSchema.omit({ id: true }).required({
 				laneId: true,
 			}),
 		)
-		.output(EventsSelectSchema)
+		.output(MemoriesSelectSchema)
 		.mutation(async ({ ctx: { db }, input }) => {
 			try {
-				const [data] = await db.insert(Events).values(input).returning();
+				const [data] = await db.insert(Memories).values(input).returning();
 
 				return data;
 			} catch (err) {
@@ -162,11 +164,11 @@ export const eventsRouter = createTRPCRouter({
 			}
 		}),
 	update: authProcedure
-		.input(EventsInsertSchema.required({ id: true }))
+		.input(MemoriesInsertSchema.required({ id: true }))
 		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx: { db }, input: { id, ...input } }) => {
 			try {
-				await db.update(Events).set(input).where(eq(Events.id, id));
+				await db.update(Memories).set(input).where(eq(Memories.id, id));
 
 				return {
 					success: true,
@@ -184,7 +186,7 @@ export const eventsRouter = createTRPCRouter({
 		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx: { db }, input: { id } }) => {
 			try {
-				await deleteEvent({ db, input: { id } });
+				await deleteMemory({ db, input: { id } });
 
 				return {
 					success: true,
