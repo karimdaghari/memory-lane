@@ -44,7 +44,6 @@ This first iteration focuses on a seamless user experience, leveraging Supabase 
 
 - **Frontend**: Built with Next.js for server-side rendering and a smooth user experience. Key pages include a homepage for managing memory lanes and a detail page for viewing (and managing) memories in a timeline (depending on auth).
 - **API with tRPC**: The API leverages tRPC's single-endpoint architecture with routers for:
-  - No traditional REST verbs (GET/POST) are used; tRPC handles queries and mutations seamlessly.
   - **Users Router**:
     - `users.getUser`: Get authenticated user's name and avatar.
     - `users.isLoggedIn`: Check if a user is currently logged in.
@@ -165,7 +164,7 @@ This approach balances flexibility with maintainability, allowing the codebase t
 
 - Node.js (v20 or later)
 - pnpm (v10 or later)
-- Docker (optional, for local Supabase setup)
+- Docker (optional, for local database setup)
 
 ### Setup
 
