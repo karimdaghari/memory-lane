@@ -42,7 +42,7 @@ export function UserMenu() {
 				isOpen={isSettingsOpen}
 				onOpenChange={setIsSettingsOpen}
 				input={{
-					name: user.name,
+					name: user.name ?? "",
 				}}
 			/>
 			<DropdownMenu>

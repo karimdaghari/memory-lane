@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useImageDelete } from "@/hooks/use-image-delete";
 import { useImageUpload } from "@/hooks/use-image-upload";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle, Trash2, UploadCloud, XCircle } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import React, { useCallback, useEffect, useState } from "react";
 import {
 	type DropzoneOptions,
