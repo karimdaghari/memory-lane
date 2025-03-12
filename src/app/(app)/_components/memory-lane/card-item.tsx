@@ -192,7 +192,7 @@ export function MemoryLaneCardItem({
 				<CardHeader className="text-center">
 					<CardTitle className="lg:text-4xl font-bold flex items-center gap-1 justify-center">
 						<span>{props.title}</span>
-						<VisibilityIndicator visibility={props.visibility} />
+						{isOwner && <VisibilityIndicator visibility={props.visibility} />}
 					</CardTitle>
 					<CardDescription>
 						Created on {dayjs(props.createdAt).format("MMM D, YYYY")}

@@ -11,9 +11,9 @@ import {
 export function MemoryLanesListing() {
 	const trpc = useTRPC();
 
-	const { data, isFetching } = useQuery(trpc.memoryLanes.getAll.queryOptions());
+	const { data, isLoading } = useQuery(trpc.memoryLanes.getAll.queryOptions());
 
-	if (isFetching) return <MemoryListingSkeleton />;
+	if (isLoading) return <MemoryListingSkeleton />;
 
 	if (data?.length === 0)
 		return (

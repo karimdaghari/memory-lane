@@ -22,11 +22,11 @@ export function MemoriesListing({ isOwner }: MemoriesListingProps) {
 
 	const trpc = useTRPC();
 
-	const { data, isFetching, isError } = useQuery(
+	const { data, isLoading, isError } = useQuery(
 		trpc.memories.getAll.queryOptions({ laneId: id, sort }),
 	);
 
-	if (isFetching) return <MemoriesListingSkeleton />;
+	if (isLoading) return <MemoriesListingSkeleton />;
 
 	if (isError)
 		return (
