@@ -1,5 +1,6 @@
 "use server";
 
+import { env } from "@/env/server";
 import { signUpSchema } from "@/shared/schemas";
 import { serverAction } from "@/trpc/lib/procedures";
 import { headers } from "next/headers";
@@ -8,7 +9,8 @@ export const signUpAction = serverAction
 	.meta({ span: "signUpAction" })
 	.input(signUpSchema)
 	.mutation(async ({ ctx: { supabase }, input: { email, password, name } }) => {
-		const origin = (await headers()).get("origin");
+		const origin =
+			env.VERCEL_PROJECT_PRODUCTION_URL ?? (await headers()).get("origin");
 
 		const emailRedirectTo = `${origin}/auth/callback`;
 
