@@ -81,7 +81,7 @@ export function MemoryCard({ isOwner, ...props }: MemoryCardProps) {
 			<CardContent>
 				<CardTitle className="truncate">{props.title}</CardTitle>
 				<CardDescription>
-					{dayjs(props.date).format("MMM D, YYYY")}
+					{dayjs(props.date).format("MMM D, YYYY HH:mm")}
 				</CardDescription>
 
 				<Typography>{props.description}</Typography>
