@@ -11,7 +11,7 @@ import { loadMemoriesFiltersParams } from "./search-params";
 
 interface Props {
 	params: Promise<{ id: string }>;
-	searchParams: SearchParams;
+	searchParams: Promise<SearchParams>;
 }
 
 export default async function Page({ params, searchParams }: Props) {
