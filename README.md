@@ -13,16 +13,18 @@
 </p>
 <br/>
 
+![Home page logged out](.github/images/screenshot-home.png)
+
 ## About
 
-Memory Lane is a web application designed to simplify sharing memories with friends and family. Instead of relying on multiple platforms like social media, messaging apps, and email, users can create a "memory lane" — a chronological collection of events with titles, descriptions, timestamps, and images — and share it via a single link.
+Memory Lane is a web application designed to simplify sharing memories with friends and family. Instead of relying on multiple platforms like social media, messaging apps, and email, users can create a "memory lane" — a chronological collection of memories with titles, descriptions, timestamps, and images — and share it via a single link.
 
 This first iteration focuses on a seamless user experience, leveraging Supabase for authentication and storage, and tRPC for type-safe API interactions.
 
 ## Features
 
 - **Manage Memory Lanes**: Define a memory lane with a title and description.
-- **Manage Events**: Include events with titles, descriptions, timestamps, and at least one image, displayed chronologically.
+- **Manage memories**: Include memories with titles, descriptions, timestamps, and at least one image, displayed chronologically.
 - **Share Easily**: Generate a shareable link for friends and family.
 - **Responsive UI**: Optimized for both desktop and mobile.
 - **Image Upload**: Drag-and-drop or file picker support, stored via Supabase Storage.
@@ -40,15 +42,31 @@ This first iteration focuses on a seamless user experience, leveraging Supabase 
 
 ### Technical Design
 
-- **Frontend**: Built with Next.js for server-side rendering and a smooth user experience. Key pages include a homepage for managing memory lanes and a detail page for viewing events in a timeline.
+- **Frontend**: Built with Next.js for server-side rendering and a smooth user experience. Key pages include a homepage for managing memory lanes and a detail page for viewing (and managing) memories in a timeline (depending on auth).
 - **API with tRPC**: The API leverages tRPC's single-endpoint architecture with routers for:
   - No traditional REST verbs (GET/POST) are used; tRPC handles queries and mutations seamlessly.
+  - **Users Router**:
+    - `users.getUser`: Get authenticated user's name and avatar.
+    - `users.isLoggedIn`: Check if a user is currently logged in.
+    - `users.updateUser`: Update user profile information.
+  - **Memory Lanes Router**:
+    - `memoryLanes.getAll`: Retrieves all memory lanes for the authenticated user.
+    - `memoryLanes.getById`: Get a specific memory lane by ID with ownership status.
+    - `memoryLanes.checkHasAccess`: Verify if current user has access to a memory lane.
+    - `memoryLanes.create`: Create a new memory lane with title and description.
+    - `memoryLanes.update`: Update an existing memory lane's details.
+    - `memoryLanes.delete`: Delete a memory lane and all associated memories.
+  - **Memories Router**:
+    - `memories.getAll`: Get all memories for a lane, chronologically sorted and grouped by month/year.
+    - `memories.create`: Add a new memory with title, description, date, and image.
+    - `memories.update`: Update an existing memory's details.
+    - `memories.delete`: Delete a memory from a lane and remove associated files.
 - **Data Model**:
   - `MemoryLanes`: `{ id, title, description, createdAt, userId, visibility }`
-  - `Events`: `{ id, laneId, title, description, date, image }`
+  - `Memories`: `{ id, laneId, title, description, date (timestamp), image }`
 - **Authentication**: Handled via Supabase Auth, ensuring only authenticated users can create and manage memory lanes.
 - **Image Handling**: Images are uploaded to Supabase Storage via a drag-and-drop interface, with URLs stored in the database for retrieval.
-- **Reusability**: Components like `EventCard`, `MemoryCardItem`, `UploaderField`, and more... are modular and -- where it makes sense -- reusable.
+- **Reusability**: Modular components like `MemoryCard`, `MemoryLaneCard`, `UploaderField` etc... along with, where it makes sense, other reusable components.
 
 ### Folder Structure
 
@@ -104,7 +122,35 @@ This approach balances flexibility with maintainability, allowing the codebase t
 
 ### UI Screenshots
 
-...
+#### Home Page
+
+![Home page logged out](.github/images/screenshot-home.png)
+*The landing page for users who aren't logged in, showcasing the Memory Lane application's value proposition and encouraging sign-up.*
+
+![Home page logged in](.github/images/home-logged-in.png)
+*Dashboard view for authenticated users, displaying their memory lanes (along with their visibility) and options to create new ones.*
+
+#### Memory Creation
+
+![Memory Modal](.github/images/memory-modal.png)
+*Modal interface for creating a new memory with fields for title, description, date, and image upload.*
+
+#### Memory Lane Experience
+
+![Memory Lane Preview](.github/images/memory-lane-preview.png)
+*A memory lane timeline **preview** showing chronologically ordered memories with their images and descriptions.*
+
+![Memory Lane Edit](.github/images/memory-lane-edit.png)
+*Interface for editing an existing memory, allowing users to update all details and imagery.*
+
+![Memory Lane Share](.github/images/memory-lane-share.png)
+*Share interface allowing users to generate and copy a link to share their memory lane with others.*
+
+![Memory Lane Link](.github/images/memory-lane-link.png)
+*Example of a shared memory lane link view, accessible to recipients without requiring login.*
+
+![Memory Lane Delete](.github/images/memory-lane-delete.png)
+*Confirmation dialog for deleting a memory lane, preventing accidental deletion of memories.*
 
 ### Why This Approach?
 
@@ -126,8 +172,8 @@ This approach balances flexibility with maintainability, allowing the codebase t
 1. Clone the repository
 
    ```bash
-   git clone https://github.com/karimdaghari/unplanned.git
-   cd unplanned
+   git clone https://github.com/karimdaghari/memory-lane.git
+   cd memory-lane
    ```
 
 2. Install dependencies
