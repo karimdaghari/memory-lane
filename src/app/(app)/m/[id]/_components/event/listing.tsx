@@ -3,6 +3,7 @@
 import { Typography } from "@/components/typography";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useTRPC } from "@/trpc/client/react";
+import type { RouterOutputs } from "@/trpc/types";
 import { useQuery } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
@@ -47,15 +48,27 @@ export function EventsListing({ isOwner }: EventListingProps) {
 		);
 
 	return (
+		<EventsTimeline groupedEvents={data.groupedEvents} isOwner={isOwner} />
+	);
+}
+
+type GroupedEvent = RouterOutputs["events"]["getAll"]["groupedEvents"][number];
+
+interface EventsTimelineProps {
+	groupedEvents: GroupedEvent[];
+	isOwner: boolean;
+}
+
+function EventsTimeline({ groupedEvents, isOwner }: EventsTimelineProps) {
+	return (
 		<div className="space-y-8">
-			{data.groupedEvents.map((group, index) => (
+			{groupedEvents.map((group, index) => (
 				<div key={group.date.toISOString()} className="relative">
 					{/* Timeline with connector line */}
 					<div
 						className="absolute left-4 top-8 bottom-0 w-0.5 bg-muted-foreground/30"
 						style={{
-							display:
-								index === data.groupedEvents.length - 1 ? "none" : "block",
+							display: index === groupedEvents.length - 1 ? "none" : "block",
 						}}
 					/>
 
