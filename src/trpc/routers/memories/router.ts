@@ -8,15 +8,19 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from "../../lib/procedures";
-import { deleteMemory } from "./delete-event";
+import { deleteMemory } from "./delete-memory";
 
 export const memoriesRouter = createTRPCRouter({
 	/**
-	 * Get all events for a memory lane, sorted and grouped by month/year.
+	 * Get all memories for a memory lane, sorted and grouped by month/year.
+	 *
+	 * @param laneId - UUID of the memory lane to fetch memories from
+	 * @param sort - Sort direction for memories, either "asc" (oldest first) or "desc" (newest first)
+	 * @returns Object containing flat array of memories and grouped memories by month
 	 *
 	 * @example
-	 * // Given these events:
-	 * const events = [
+	 * // Given these memories:
+	 * const memories = [
 	 *   { id: "1", date: "2024-03-15", title: "Spring Break" },
 	 *   { id: "2", date: "2024-03-20", title: "First Day of Spring" },
 	 *   { id: "2", date: "2024-02-14", title: "Valentine's Day" },
@@ -24,51 +28,40 @@ export const memoriesRouter = createTRPCRouter({
 	 *   { id: "4", date: "2024-03-01", title: "March Event" }
 	 * ]
 	 *
-	 * // With sort: "asc" (default)
+	 * // With sort: "asc"
 	 * {
-	 *   events: [ // Chronologically sorted from past to future
+	 *   memories: [ // Chronologically sorted from past to future
 	 *     { id: "3", date: "2024-01-01", title: "New Year's Day" },
 	 *     { id: "2", date: "2024-02-14", title: "Valentine's Day" },
 	 *     { id: "4", date: "2024-03-01", title: "March Event" },
 	 *     { id: "1", date: "2024-03-15", title: "Spring Break" },
 	 *     { id: "2", date: "2024-03-20", title: "First Day of Spring" }
 	 *   ],
-	 *   groupedEvents: { // Months sorted chronologically
-	 *     "January 2024": [{ id: "3", date: "2024-01-01", title: "New Year's Day" }],
-	 *     "February 2024": [{ id: "2", date: "2024-02-14", title: "Valentine's Day" }],
-	 *     "March 2024": [
-	 *       { id: "4", date: "2024-03-01", title: "March Event" },
-	 *       { id: "1", date: "2024-03-15", title: "Spring Break" },
-	 *       { id: "2", date: "2024-03-20", title: "First Day of Spring" }
-	 *     ]
-	 *   }
-	 * }
-	 *
-	 * // With sort: "desc"
-	 * {
-	 *   events: [ // Chronologically sorted from future to past
-	 *     { id: "2", date: "2024-03-20", title: "First Day of Spring" },
-	 *     { id: "1", date: "2024-03-15", title: "Spring Break" },
-	 *     { id: "4", date: "2024-03-01", title: "March Event" },
-	 *     { id: "2", date: "2024-02-14", title: "Valentine's Day" },
-	 *     { id: "3", date: "2024-01-01", title: "New Year's Day" }
-	 *   ],
-	 *   groupedEvents: { // Months sorted chronologically in reverse
-	 *     "March 2024": [
-	 *       { id: "2", date: "2024-03-20", title: "First Day of Spring" },
-	 *       { id: "1", date: "2024-03-15", title: "Spring Break" },
-	 *       { id: "4", date: "2024-03-01", title: "March Event" }
-	 *     ],
-	 *     "February 2024": [{ id: "2", date: "2024-02-14", title: "Valentine's Day" }],
-	 *     "January 2024": [{ id: "3", date: "2024-01-01", title: "New Year's Day" }]
-	 *   }
+	 *   groupedMemories: [ // Months sorted chronologically
+	 *     {
+	 *       date: new Date("2024-01-01"),
+	 *       memories: [{ id: "3", date: "2024-01-01", title: "New Year's Day" }]
+	 *     },
+	 *     {
+	 *       date: new Date("2024-02-01"),
+	 *       memories: [{ id: "2", date: "2024-02-14", title: "Valentine's Day" }]
+	 *     },
+	 *     {
+	 *       date: new Date("2024-03-01"),
+	 *       memories: [
+	 *         { id: "4", date: "2024-03-01", title: "March Event" },
+	 *         { id: "1", date: "2024-03-15", title: "Spring Break" },
+	 *         { id: "2", date: "2024-03-20", title: "First Day of Spring" }
+	 *       ]
+	 *     }
+	 *   ]
 	 * }
 	 */
 	getAll: publicProcedure
 		.input(
 			z.object({
 				laneId: z.string().uuid(),
-				sort: z.enum(["asc", "desc"]).default("asc"),
+				sort: z.enum(["asc", "desc"]).default("desc"),
 			}),
 		)
 		.output(

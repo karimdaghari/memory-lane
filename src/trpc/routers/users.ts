@@ -1,11 +1,7 @@
 import { updateUserSchema } from "@/shared/schemas";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import {
-	authProcedure,
-	createTRPCRouter,
-	publicProcedure,
-} from "../lib/procedures";
+import { authProcedure, createTRPCRouter } from "../lib/procedures";
 
 export const usersRouter = createTRPCRouter({
 	getUser: authProcedure
@@ -33,18 +29,6 @@ export const usersRouter = createTRPCRouter({
 				});
 			}
 		}),
-	isLoggedIn: publicProcedure.output(z.boolean()).query(({ ctx }) => {
-		try {
-			return ctx.user !== null;
-		} catch (error) {
-			console.error("Error checking login status:", error);
-			throw new TRPCError({
-				code: "INTERNAL_SERVER_ERROR",
-				message: "Failed to verify login status",
-				cause: error,
-			});
-		}
-	}),
 	updateUser: authProcedure
 		.input(updateUserSchema)
 		.output(z.object({ success: z.boolean(), message: z.string() }))

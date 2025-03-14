@@ -8,7 +8,7 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from "../lib/procedures";
-import { deleteMemory } from "./memories/delete-event";
+import { deleteMemory } from "./memories/delete-memory";
 
 export const memoryLanesRouter = createTRPCRouter({
 	getAll: authProcedure.output(MemoryLaneSchema.array()).query(
